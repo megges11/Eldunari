@@ -4,49 +4,40 @@ import eldunari.general.classes.OutputHandler;
 import eldunari.general.enumeration.OutputType;
 import eldunari.origin.annotation.Column;
 import eldunari.origin.annotation.DataModel;
+import eldunari.origin.classes.helper.OrderByDefinition;
+import eldunari.origin.classes.helper.QueryResult;
+import eldunari.origin.classes.helper.SQLiteHelper;
+import eldunari.origin.classes.helper.SQLiteHelperResult;
+import eldunari.origin.classes.helper.WhereDefinition;
 import eldunari.origin.enumeration.DataType;
+import eldunari.origin.interfaces.IConnectable;
 import eldunari.origin.interfaces.IObject;
 import eldunari.origin.interfaces.ITrigger;
 import eldunari.origin.interfaces.IValidator;
 
 import java.lang.reflect.Field;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
 
-public class Connector {
+public abstract class Connector {
+	String VALIDATOR_PACKAGE = "mpad.contracts.validator";
+	String TRIGGER_PACKAGE = "mpad.contracts.trigger";
 
-	private ArrayList<String> error = new ArrayList<String>();
-	public String VALIDATOR_PACKAGE = "mpad.contracts.validator";
-	public String TRIGGER_PACKAGE = "mpad.contracts.trigger";
-
-	private Connection getConnection(String name){
-		Connection con = null;
-		try {
-			Class.forName("org.sqlite.JDBC");
-			con = DriverManager.getConnection("jdbc:sqlite:"+name+".db");
-		} catch ( Exception e ) {
-			addError( e.getClass().getName() + ": " + e.getMessage() );
-		}
-		return con;
-	}	
-	public boolean Initialize(String dbname,Class<? extends IObject> cls) throws Exception{	
+	public boolean Initialize(IConnectable connector,Class<? extends IObject> cls) throws Exception{	
 		SQLiteHelper helper = new SQLiteHelper(cls);
 		SQLiteHelperResult result = helper.getTableQuery();
 		if(result.isSuccess()){	
-			executeUpdate(dbname, result.getValue());
+			connector.executeUpdate(result.getValue());
 		}else{
 			throw new Exception(result.getMessage());
 		}
 		return result.isSuccess();
 	}
 
-	public boolean Insert(String dbname,IObject obj){
+	public boolean Insert(IConnectable connector,IObject obj){
 		ITrigger trigger = getTrigger(obj);
 		if(trigger != null){
 			obj = trigger.PreItem(obj);
@@ -59,7 +50,7 @@ public class Connector {
 				String error = "";
 				for(String err:validator.Error()){
 					error += err+"\n";
-					this.error.add(err);
+					//					this.error.add(err);
 				}
 				OutputHandler.Message(OutputType.Error,error);
 				return false;
@@ -69,7 +60,7 @@ public class Connector {
 		SQLiteHelper helper = new SQLiteHelper(obj);
 		SQLiteHelperResult result = helper.getInsertQuery();
 		if(result.isSuccess()){	
-			if (executeUpdate(dbname,result.getValue()) != 0){
+			if (connector.executeUpdate(result.getValue()) != 0){
 				if(trigger != null)
 					obj = trigger.PostItem(obj);
 				return true;
@@ -77,30 +68,29 @@ public class Connector {
 		}return false;
 	}
 
-	public boolean Delete(String dbname,IObject obj){
+	public boolean Delete(IConnectable connector,IObject obj){
 		SQLiteHelper helper = new SQLiteHelper(obj);
 		SQLiteHelperResult result = helper.getDeleteQuery();
 		if(result.isSuccess()){
-			return executeUpdate(dbname,result.getValue())!=0;
+			return connector.executeUpdate(result.getValue())!=0;
 		}
 		return false;		
 	}
 
-	public boolean Update(String dbname, IObject obj, IObject toUpdate){
+	public boolean Update(IConnectable connector, IObject obj, IObject toUpdate){
 		SQLiteHelper helper = new SQLiteHelper(obj);
 		SQLiteHelperResult result = helper.getUpdateQuery(toUpdate);
 		if(result.isSuccess()){
-			return executeUpdate(dbname,result.getValue())!=0;
+			return connector.executeUpdate(result.getValue())!=0;
 		}
 		return false;
 	}
-	
-	public <T extends IObject> ArrayList<T> Select(String dbname, Class<T> cls, String[] fieldnames, WhereDefinition[] where, OrderByDefinition[] orderby,String groupby,int limit){
 
+	public <T extends IObject> ArrayList<T> Select(IConnectable connector, Class<T> cls, String[] fieldnames, WhereDefinition[] where, OrderByDefinition[] orderby,String groupby,int limit){
 		SQLiteHelper helper = new SQLiteHelper(cls);
 		SQLiteHelperResult result = helper.getSelectQuery(fieldnames, where, orderby,groupby,limit);
 		if(result.isSuccess()){
-			QueryResult queryresult = executeQuery(dbname,result.getValue());
+			QueryResult queryresult = connector.executeQuery(result.getValue());
 			if(queryresult == null || queryresult.getResult() == null){
 				return null;
 			}
@@ -121,7 +111,7 @@ public class Connector {
 		return null;
 	}
 
-	private <T extends IObject> T ResultToObject(ResultSet result,Class<T> cls){
+	public <T extends IObject> T ResultToObject(ResultSet result,Class<T> cls){
 		try{
 			T obj = cls.newInstance();
 			Field[] fields = cls.getDeclaredFields();
@@ -139,7 +129,7 @@ public class Connector {
 		}
 	}
 
-	private Field setFieldValue(Field field,String value,IObject obj) {
+	public Field setFieldValue(Field field,String value,IObject obj) {
 		try {
 			Column column = field.getAnnotation(Column.class);
 			Class<?>[] bestfits = column.type().getBestFitClasses();
@@ -185,31 +175,7 @@ public class Connector {
 		return field;
 	}
 
-	private QueryResult executeQuery(String dbname,String sql){
-		try{
-			Connection con = getConnection(dbname);
-			Statement stmt = con.createStatement();
-			ResultSet result = stmt.executeQuery(sql);
-			return new QueryResult(con,stmt,result);			
-		}catch(Exception ex){
-			return null;
-		}
-	}
-	private int executeUpdate(String dbname,String sql){
-		try{
-			Connection con = getConnection(dbname);
-			Statement stmt = con.createStatement();
-			int result = stmt.executeUpdate(sql);
-			stmt.close();
-			con.close();
-			return result;	
-		}catch(Exception ex){
-			addError(ex.getMessage());
-			return 0;
-		}
-	}	
-
-	private ITrigger getTrigger(Object obj){
+	public ITrigger getTrigger(Object obj){
 		try{
 			Class<?> cls = obj.getClass();
 			Class<?> trigger = ClassFinder.find(TRIGGER_PACKAGE+"."+cls.getSimpleName()+"_Trigger");
@@ -227,7 +193,7 @@ public class Connector {
 		return null;		
 	}
 
-	private IValidator getValidator(IObject obj){
+	public IValidator getValidator(IObject obj){
 		try{
 			Class<? extends IObject> cls = obj.getClass();
 			Class<?> validator = ClassFinder.find(VALIDATOR_PACKAGE+"."+cls.getSimpleName()+"_Validator");
@@ -257,8 +223,8 @@ public class Connector {
 			}else if(typecls.equals(String.class)){
 				field.set(obj, value.toString());
 			}else if(typecls.equals(Calendar.class)){
-				//				String calstr = value.toString();
-				//				field.set(obj, VisualHelper.ToCalendar(calstr));
+//				String calstr = value.toString();
+				field.set(obj, null);
 			}else if(typecls.equals(double.class)){
 				field.set(obj, Double.parseDouble(value.toString()));
 			}else{
@@ -268,34 +234,5 @@ public class Connector {
 			ex.printStackTrace();
 		}
 		return field;
-	}
-
-	//	public boolean UpdateOrInsert(String dbname,IObject obj,IObject currentObject){
-	//		if(currentObject != null){
-	//			Update(dbname,obj.getClass(),obj,currentObject);
-	//			return true;
-	//		}else{
-	//			return Insert(dbname,obj);
-	//		}
-	//	}
-
-	private void addError(String message){
-		error.add(message);
-	}
-	public boolean hasError(){
-		return error.size()!=0;
-	}
-	public ArrayList<String> getError(){
-		return error;
-	}
-	public String getError(String seperator){
-		String err = "";
-		for(String e : error){
-			err +=e+seperator;
-		}
-		return err;
-	}
-	public void clearError(){
-		error.clear();
 	}
 }
