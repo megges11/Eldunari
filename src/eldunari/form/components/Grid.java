@@ -28,7 +28,7 @@ public class Grid extends JTable implements IComponent{
 		scp.setLocation(this.getLocation());
 		return scp;
 	}
-	
+
 	@Override
 	public void setTag(String value) {
 		this.tag = value;
