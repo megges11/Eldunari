@@ -1,55 +1,34 @@
 package eldunari.form.components;
 import java.awt.Component;
-import java.util.ArrayList;
 
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
+import javax.swing.JFormattedTextField;
+import javax.swing.text.MaskFormatter;
 
-import eldunari.form.classes.GridModel;
 import eldunari.form.classes.VisualHelper;
 import eldunari.form.enumation.Orientation;
 import eldunari.form.interfaces.IComponent;
 
-public class Grid<T> extends JTable implements IComponent{
-	private static final long serialVersionUID = -5194270868779952867L;
+public class FormattedTextField extends JFormattedTextField implements IComponent{
+	private static final long serialVersionUID = -1865066921897348114L;
+
 	private String tag;
-	private int percentHeight;
 	private int percentWidth;
-	private Orientation orientation;
-	private Component neighborComponent;	
+	private int percentHeight;
 	
 	private int maxWidth;
 	private int minWidth;
 	private int maxHeight;
 	private int minHeight;
 	
-	
-	
-	public Grid(){
-
+	public FormattedTextField(MaskFormatter format){
+		super(format);
 	}
-	public Grid(int numRows, int numColumns){
-		super(numRows,numColumns);
-	}
-	public Grid(Object[][] rows, Object[] columns){
-		super(rows,columns);
-	}
-	public Grid(GridModel dm){
-		super(dm);
-	}
-	
-
-	public void reload(Object[][] rows, Object[] columns){
+	public FormattedTextField(){
 		
 	}
-
-	public JScrollPane getTableWithHead(){
-		JScrollPane scp = new JScrollPane(this);
-		scp.setSize(this.getSize());
-		scp.setLocation(this.getLocation());
-		return scp;
+	public void setLocation(Component com, Orientation orientation){
+		this.setLocation(VisualHelper.GetPosition(com,orientation));
 	}
-
 	@Override
 	public void setTag(String value) {
 		this.tag = value;
@@ -57,35 +36,28 @@ public class Grid<T> extends JTable implements IComponent{
 	@Override
 	public String getTag() {
 		return tag;
-	}	
-
-	public void setLocation(Component com, Orientation orientation){
-		this.orientation = orientation;
-		this.neighborComponent = com;
-		this.setLocation(VisualHelper.GetPosition(com,orientation));
 	}
 	@Override
 	public Orientation getOrientation() {
-		return orientation;
+		return null;
 	}
-
 	@Override
 	public Component getNeighbor() {
-		return neighborComponent;
+		return null;
 	}
 	@Override
 	public void setSizePercent(Component parent,int percentWidth, int percentHeight) {
 		this.percentHeight = percentHeight;
 		this.percentWidth = percentWidth;
-		this.setSize((parent.getWidth()*(percentWidth))/100,(parent.getHeight()*(percentHeight))/100);
+		this.setSize(parent.getWidth()*(percentWidth/100),parent.getHeight()*(percentHeight/100));
 	}
-
 	public int getPercentHeight(){
 		return percentHeight;
 	}
 	public int getPercentWidth(){
 		return percentWidth;
 	}
+	
 	@Override
 	public int getMinWidth() {
 		return minWidth;
@@ -128,11 +100,5 @@ public class Grid<T> extends JTable implements IComponent{
 	public boolean isLockedY(){
 		return locky;
 	}
-	
-	public void setValue(Object obj){}
-	public Object getValue(){
-		return null;
-	}
 
 }
-

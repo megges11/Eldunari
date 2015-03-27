@@ -1,69 +1,44 @@
 package eldunari.form.components;
+
 import java.awt.Component;
-import java.util.ArrayList;
 
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
+import javax.swing.JLabel;
 
-import eldunari.form.classes.GridModel;
 import eldunari.form.classes.VisualHelper;
 import eldunari.form.enumation.Orientation;
 import eldunari.form.interfaces.IComponent;
 
-public class Grid<T> extends JTable implements IComponent{
-	private static final long serialVersionUID = -5194270868779952867L;
+public class Label extends JLabel implements IComponent{
+	private static final long serialVersionUID = -2998000665145523581L;
+
 	private String tag;
-	private int percentHeight;
-	private int percentWidth;
 	private Orientation orientation;
-	private Component neighborComponent;	
+	private Component neighborComponent;
+	private int percentWidth;
+	private int percentHeight;
 	
 	private int maxWidth;
 	private int minWidth;
 	private int maxHeight;
 	private int minHeight;
 	
-	
-	
-	public Grid(){
-
-	}
-	public Grid(int numRows, int numColumns){
-		super(numRows,numColumns);
-	}
-	public Grid(Object[][] rows, Object[] columns){
-		super(rows,columns);
-	}
-	public Grid(GridModel dm){
-		super(dm);
-	}
-	
-
-	public void reload(Object[][] rows, Object[] columns){
-		
-	}
-
-	public JScrollPane getTableWithHead(){
-		JScrollPane scp = new JScrollPane(this);
-		scp.setSize(this.getSize());
-		scp.setLocation(this.getLocation());
-		return scp;
-	}
-
 	@Override
 	public void setTag(String value) {
 		this.tag = value;
 	}
+
 	@Override
 	public String getTag() {
 		return tag;
-	}	
+	}
 
-	public void setLocation(Component com, Orientation orientation){
+	@Override
+	public void setLocation(Component com, Orientation orientation) {
 		this.orientation = orientation;
 		this.neighborComponent = com;
-		this.setLocation(VisualHelper.GetPosition(com,orientation));
+		this.setLocation(VisualHelper.GetPosition(com, orientation));
 	}
+
 	@Override
 	public Orientation getOrientation() {
 		return orientation;
@@ -73,18 +48,22 @@ public class Grid<T> extends JTable implements IComponent{
 	public Component getNeighbor() {
 		return neighborComponent;
 	}
+
 	@Override
 	public void setSizePercent(Component parent,int percentWidth, int percentHeight) {
-		this.percentHeight = percentHeight;
 		this.percentWidth = percentWidth;
-		this.setSize((parent.getWidth()*(percentWidth))/100,(parent.getHeight()*(percentHeight))/100);
+		this.percentHeight = percentHeight;
+		this.setSize(parent.getWidth()*(percentWidth/100),parent.getHeight()*(percentHeight/100));
 	}
 
-	public int getPercentHeight(){
-		return percentHeight;
-	}
-	public int getPercentWidth(){
+	@Override
+	public int getPercentWidth() {
 		return percentWidth;
+	}
+
+	@Override
+	public int getPercentHeight() {
+		return percentHeight;
 	}
 	@Override
 	public int getMinWidth() {
@@ -128,11 +107,12 @@ public class Grid<T> extends JTable implements IComponent{
 	public boolean isLockedY(){
 		return locky;
 	}
-	
-	public void setValue(Object obj){}
-	public Object getValue(){
-		return null;
+
+	public void setValue(Object obj){
+		this.setText((String)obj);
 	}
-
+	public Object getValue(){
+		return this.getText();
+	}
+	
 }
-

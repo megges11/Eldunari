@@ -119,7 +119,10 @@ public abstract class Connector {
 				fields[i].setAccessible(true);
 				Column column = fields[i].getAnnotation(Column.class);
 				if(column != null){
-					fields[i] = setFieldValue(fields[i],result.getString(column.name()),obj);
+					
+					if(ResultSetContains(result,column.name())){
+						fields[i] = setFieldValue(fields[i],result.getString(column.name()),obj);
+					}
 				}
 			}
 			return obj;
@@ -129,6 +132,15 @@ public abstract class Connector {
 		}
 	}
 
+	public boolean ResultSetContains(ResultSet result, String columnname){
+		try{
+			return result.findColumn(columnname) != -1;
+		}catch(Exception ex){
+			return false;
+		}
+		
+	}
+	
 	public Field setFieldValue(Field field,String value,IObject obj) {
 		try {
 			Column column = field.getAnnotation(Column.class);

@@ -3,7 +3,7 @@ package eldunari.form.interfaces;
 import java.awt.Container;
 import java.awt.Dimension;
 
-import eldunari.form.classes.Form;
+import eldunari.form.components.Form;
 
 public interface IGridLayer {
 

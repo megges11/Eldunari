@@ -79,4 +79,36 @@ public class SqliteConnector extends Connector implements IConnectable{
 		return null;
 	}	
 	
+	@Override
+	public <T extends IObject> ArrayList<T> Select(Class<T> cls) {
+		return this.Select(this, cls, null, null, null, null, -1);
+	}
+
+	@Override
+	public <T extends IObject> ArrayList<T> Select(Class<T> cls,
+			String[] fieldnames) {
+		return this.Select(this, cls, fieldnames, null, null, null, -1);
+	}
+
+	@Override
+	public <T extends IObject> ArrayList<T> Select(Class<T> cls,
+			String[] fieldnames, WhereDefinition[] where) {
+		return this.Select(this, cls, fieldnames, where, null, null, -1);
+	}
+
+	@Override
+	public <T extends IObject> ArrayList<T> Select(Class<T> cls,
+			String[] fieldnames, WhereDefinition[] where,
+			OrderByDefinition[] orderby) {
+		return this.Select(this, cls, fieldnames, where, orderby, null, -1);
+	}
+
+	@Override
+	public <T extends IObject> ArrayList<T> Select(Class<T> cls,
+			String[] fieldnames, WhereDefinition[] where,
+			OrderByDefinition[] orderby, String groupby) {
+		return this.Select(this, cls, fieldnames, where, orderby, groupby, -1);
+	}	
+	
+	
 }

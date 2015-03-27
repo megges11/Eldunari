@@ -171,9 +171,9 @@ public class SQLiteHelper {
 			return new SQLiteHelperResult(false,"","Class<? extends Object> can not be null");
 		}
 		String sql = "SELECT ";
-		if(fieldnames!=null && where.length!= 0){
+		if(fieldnames!=null && fieldnames.length!= 0){
 			for(int i = 0 ; i<fieldnames.length;i++){
-				sql+=fieldnames;
+				sql+=fieldnames[i];
 				if(i<fieldnames.length-1){
 					sql+=",";
 				}
