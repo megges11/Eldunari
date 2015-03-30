@@ -18,7 +18,7 @@ import eldunari.origin.interfaces.IObject;
 
 public abstract class Form extends JFrame implements IResizeListener{
 	private static final long serialVersionUID = 8173638485155786959L;
-	
+
 	public static final Dimension DEFAULT_SIZE = new Dimension(700,500);
 	public static String TITLE = "Eldunari Form";
 	public static Color DEFAULT_BACKGROUND = Color.LIGHT_GRAY;
@@ -27,28 +27,28 @@ public abstract class Form extends JFrame implements IResizeListener{
 	public static int DEFAULT_PADDING_TOP = 5;
 	public static int DEFAULT_PADDING_BOTTOM = 5;
 	public static int DEFAULT_PADDING_RIGHT=5;
-	
+
 	public static Point DEFAULT_COMPONENT_START_LOCATION = new Point(10,10);
 	public static int DEFAULT_ITEM_HEIGHT = 25;
 	public static int DEFAULT_ITEM_WIDTH = 150;
-	
+
 	public Class<?> currentClass;
 	public IObject currentObject;
 	public ViewType currentViewType;
 	public ToolBar toolbar;
-	
+
 	public static Dimension DEFAULT_ITEM_SIZE(){
 		return new Dimension(DEFAULT_ITEM_WIDTH,DEFAULT_ITEM_HEIGHT);
 	}
-	
+
 	public Form(Class<?> currentClass){
 		this.setTitle(TITLE);
 		this.currentClass = currentClass;			
 		this.addComponentListener(new ComponentAdapter() {
-            public void componentResized(ComponentEvent e) {
-                onResize();
-            }
-        });
+			public void componentResized(ComponentEvent e) {
+				onResize();
+			}
+		});
 	}
 
 	public abstract void init_menubar();
@@ -61,7 +61,7 @@ public abstract class Form extends JFrame implements IResizeListener{
 		currentViewType =type;
 		currentObject = obj;
 	}
-	
+
 	public void onResize(){
 		Component[] components = this.getContentPane().getComponents();
 		for(Component component : components){
@@ -91,24 +91,26 @@ public abstract class Form extends JFrame implements IResizeListener{
 					}	
 				}
 				component.setSize(width,height);
-				if(!com.isLockedX() && !com.isLockedY()){
-					com.setLocation(com.getNeighbor(), com.getOrientation());
-				}else if(com.isLockedX()){
-					Point location = VisualHelper.GetPosition(com.getNeighbor(), com.getOrientation());
-					component.setLocation(component.getLocation().x,location.y);
-				}else if(com.isLockedY()){
-					Point location = VisualHelper.GetPosition(com.getNeighbor(), com.getOrientation());
-					component.setLocation(location.x,component.getLocation().y);
-				}				
+				if(com.getNeighbor() != null){
+					if(!com.isLockedX() && !com.isLockedY()){
+						com.setLocation(com.getNeighbor(), com.getOrientation());
+					}else if(com.isLockedX()){
+						Point location = VisualHelper.GetPosition(com.getNeighbor(), com.getOrientation());
+						component.setLocation(component.getLocation().x,location.y);
+					}else if(com.isLockedY()){
+						Point location = VisualHelper.GetPosition(com.getNeighbor(), com.getOrientation());
+						component.setLocation(location.x,component.getLocation().y);
+					}
+				}
 			}
 		}
 	}
-	
-//	public void init_toolbar(){}
-//	public abstract void init_toolbar(ViewType type);
-//	public void init_toolbar(ToolBar toolbar){
-//		this.add(toolbar);
-//	}
+
+	//	public void init_toolbar(){}
+	//	public abstract void init_toolbar(ViewType type);
+	//	public void init_toolbar(ToolBar toolbar){
+	//		this.add(toolbar);
+	//	}
 	public void reload(){
 		this.revalidate();
 		this.repaint();

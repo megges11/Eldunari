@@ -5,7 +5,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.lang.reflect.Field;
-import java.util.Calendar;
+import java.util.Date;
 
 import javax.swing.JTable;
 import javax.swing.JTextArea;
@@ -13,6 +13,7 @@ import javax.swing.JTextField;
 
 import eldunari.form.enumation.Orientation;
 import eldunari.form.enumation.ViewType;
+import eldunari.form.interfaces.IComponent;
 import eldunari.form.interfaces.IGridLayer;
 import eldunari.form.interfaces.ILayer;
 import eldunari.general.classes.ClassFinder;
@@ -25,8 +26,8 @@ import eldunari.form.components.Form;
 
 public class VisualHelper {
 
-	public static final String layer_package = "de.itx3.winforms.layer";
-	public static final String grid_package = "de.itx3.winforms.grid";
+	public static String layer_package = "de.itx3.winforms.layer";
+	public static String grid_package = "de.itx3.winforms.grid";
 
 
 	public static Container getLayout(Form frame,Class<?> currentClass,ViewType type,Dimension dimension) {
@@ -104,6 +105,7 @@ public class VisualHelper {
 					Column col = field.getAnnotation(Column.class);
 					if(col != null){
 						String col_name = col.name();
+
 						Component component = getElementByName("["+col_name+"]",container);
 						if(component != null){
 							Class<?> comClass = component.getClass();
@@ -116,9 +118,9 @@ public class VisualHelper {
 								JTextField tfCom = (JTextField)component;
 								tfCom.setText(field.getInt(obj)+"");
 
-							}else if(comClass.equals(JTextField.class) && field.getType().equals(Calendar.class)){
+							}else if(comClass.equals(JTextField.class) && field.getType().equals(Date.class)){
 								JTextField tfCom = (JTextField)component;
-								Calendar cal = (Calendar)field.get(obj);					
+								Date cal = new Date(field.getLong(obj));					
 								tfCom.setText(cal.toString());
 
 							}else if(comClass.equals(JTextArea.class) && field.getType().equals(String.class)){
@@ -165,11 +167,14 @@ public class VisualHelper {
 	public static Component getElementByName(String name, Container container){
 		Component[] components = container.getComponents();
 		for(Component com : components){
-			if(com!= null){
-				String com_name = com.getName();
-				if(com_name != null){
-					if(com_name.equalsIgnoreCase(name)){
-						return com;
+			if(com instanceof IComponent){
+				IComponent compo = (IComponent) com;
+				if(compo!= null){
+					String com_name = compo.getTag();
+					if(com_name != null){
+						if(com_name.equalsIgnoreCase(name)){
+							return (Component)compo;
+						}
 					}
 				}
 			}

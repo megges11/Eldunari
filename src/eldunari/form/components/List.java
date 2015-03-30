@@ -1,6 +1,7 @@
 package eldunari.form.components;
 
 import java.awt.Component;
+import java.awt.Point;
 
 import javax.swing.JList;
 
@@ -27,6 +28,13 @@ public class List<T> extends JList<T> implements IComponent{
 		return this.tag;
 	}
 	
+	public Point getLocationXY(){
+		return super.getLocation();
+	}	
+	
+	public void setLocation(int x, int y){
+		super.setLocation(x, y);
+	}
 	@Override
 	public void setLocation(Component com, Orientation orientation) {
 		this.setLocation(VisualHelper.GetPosition(com,orientation));

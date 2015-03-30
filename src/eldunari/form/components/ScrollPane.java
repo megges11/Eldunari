@@ -3,16 +3,17 @@ package eldunari.form.components;
 import java.awt.Component;
 import java.awt.Point;
 
-import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 
 import eldunari.form.classes.VisualHelper;
 import eldunari.form.enumation.Orientation;
 import eldunari.form.interfaces.IComponent;
 
-public class RadioButton extends JRadioButton implements IComponent{
-	private static final long serialVersionUID = -4187208235979508932L;
-
+public class ScrollPane extends JScrollPane implements IComponent{
+	private static final long serialVersionUID = 4169579731842793022L;
 	private String tag;
+	private Orientation orientation;
+	private Component neighborComponent;
 	private int percentWidth;
 	private int percentHeight;
 	
@@ -21,13 +22,36 @@ public class RadioButton extends JRadioButton implements IComponent{
 	private int maxHeight;
 	private int minHeight;
 	
-	public void setTag(String value){
+	private boolean lockx;
+	private boolean locky;	
+	
+	public ScrollPane(Component component,IComponent com){
+		super(component);
+		this.setSize(component.getSize());
+		this.setLocation(component.getLocation());
+		this.maxHeight = com.getMaxHeight();
+		this.minHeight = com.getMinHeight();
+		this.maxWidth = com.getMaxWidth();
+		this.minWidth = com.getMinWidth();
+		this.percentHeight = com.getPercentHeight();
+		this.percentWidth = com.getPercentWidth();
+		this.orientation = com.getOrientation();
+		this.neighborComponent = com.getNeighbor();
+		this.lockx = com.isLockedX();
+		this.locky = com.isLockedY();
+		
+	}
+
+	@Override
+	public void setTag(String value) {
 		this.tag = value;
 	}
-	public String getTag(){
-		return this.tag;
+
+	@Override
+	public String getTag() {
+		return tag;
 	}
-	
+
 	public Point getLocationXY(){
 		return super.getLocation();
 	}	
@@ -37,27 +61,36 @@ public class RadioButton extends JRadioButton implements IComponent{
 	}
 	@Override
 	public void setLocation(Component com, Orientation orientation) {
-		this.setLocation(VisualHelper.GetPosition(com,orientation));
+		this.orientation = orientation;
+		this.neighborComponent = com;
+		this.setLocation(VisualHelper.GetPosition(com, orientation));
 	}
+
 	@Override
 	public Orientation getOrientation() {
-		return null;
+		return orientation;
 	}
+
 	@Override
 	public Component getNeighbor() {
-		return null;
+		return neighborComponent;
 	}
+
 	@Override
 	public void setSizePercent(Component parent,int percentWidth, int percentHeight) {
-		this.percentHeight = percentHeight;
 		this.percentWidth = percentWidth;
+		this.percentHeight = percentHeight;
 		this.setSize(parent.getWidth()*(percentWidth/100),parent.getHeight()*(percentHeight/100));
 	}
-	public int getPercentHeight(){
-		return percentHeight;
-	}
-	public int getPercentWidth(){
+
+	@Override
+	public int getPercentWidth() {
 		return percentWidth;
+	}
+
+	@Override
+	public int getPercentHeight() {
+		return percentHeight;
 	}
 	@Override
 	public int getMinWidth() {
@@ -85,9 +118,7 @@ public class RadioButton extends JRadioButton implements IComponent{
 		this.minHeight = height;
 		this.minWidth = width;	
 	}
-	
-	private boolean lockx;
-	private boolean locky;	
+
 	
 	public void setLockedX(boolean value){
 		this.lockx = value;
@@ -102,10 +133,9 @@ public class RadioButton extends JRadioButton implements IComponent{
 		return locky;
 	}
 
-	public void setValue(Object obj){
-		this.setSelected((boolean) obj);
-	}
+	public void setValue(Object obj){}
 	public Object getValue(){
-		return this.isSelected();
+		return null;
 	}
+	
 }

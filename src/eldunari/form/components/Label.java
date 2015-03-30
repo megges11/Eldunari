@@ -1,6 +1,7 @@
 package eldunari.form.components;
 
 import java.awt.Component;
+import java.awt.Point;
 
 import javax.swing.JLabel;
 
@@ -22,6 +23,9 @@ public class Label extends JLabel implements IComponent{
 	private int maxHeight;
 	private int minHeight;
 	
+	private boolean lockx;
+	private boolean locky;	
+	
 	@Override
 	public void setTag(String value) {
 		this.tag = value;
@@ -32,6 +36,13 @@ public class Label extends JLabel implements IComponent{
 		return tag;
 	}
 
+	public Point getLocationXY(){
+		return super.getLocation();
+	}	
+	
+	public void setLocation(int x, int y){
+		super.setLocation(x, y);
+	}
 	@Override
 	public void setLocation(Component com, Orientation orientation) {
 		this.orientation = orientation;
@@ -91,9 +102,7 @@ public class Label extends JLabel implements IComponent{
 		this.minHeight = height;
 		this.minWidth = width;	
 	}
-	
-	private boolean lockx;
-	private boolean locky;	
+
 	
 	public void setLockedX(boolean value){
 		this.lockx = value;

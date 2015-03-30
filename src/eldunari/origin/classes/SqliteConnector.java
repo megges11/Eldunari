@@ -108,6 +108,11 @@ public class SqliteConnector extends Connector implements IConnectable{
 			String[] fieldnames, WhereDefinition[] where,
 			OrderByDefinition[] orderby, String groupby) {
 		return this.Select(this, cls, fieldnames, where, orderby, groupby, -1);
+	}
+
+	@Override
+	public boolean hasError() {
+		return (errors.size() != 0);
 	}	
 	
 	

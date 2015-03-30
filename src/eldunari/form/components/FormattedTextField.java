@@ -1,5 +1,6 @@
 package eldunari.form.components;
 import java.awt.Component;
+import java.awt.Point;
 
 import javax.swing.JFormattedTextField;
 import javax.swing.text.MaskFormatter;
@@ -25,6 +26,13 @@ public class FormattedTextField extends JFormattedTextField implements IComponen
 	}
 	public FormattedTextField(){
 		
+	}
+	public Point getLocationXY(){
+		return super.getLocation();
+	}	
+	
+	public void setLocation(int x, int y){
+		super.setLocation(x, y);
 	}
 	public void setLocation(Component com, Orientation orientation){
 		this.setLocation(VisualHelper.GetPosition(com,orientation));

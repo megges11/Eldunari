@@ -10,6 +10,7 @@ import eldunari.origin.classes.helper.WhereDefinition;
 public interface IConnectable {
 
 	String getError();
+	boolean hasError();
 	
 	Connection getConnection();
 	QueryResult executeQuery(String sql);

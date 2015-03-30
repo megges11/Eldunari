@@ -38,7 +38,7 @@ public class SQLiteHelper {
 
 	public SQLiteHelperResult getTableQuery(){
 		if(cls == null){
-			return new SQLiteHelperResult(false,"","Class<? extends Object> can not be null");
+			return new SQLiteHelperResult(false,"","Class<? extends IObject> can not be null");
 		}
 		String sql = "CREATE TABLE IF NOT EXISTS "+getTableName(cls)+"(";
 		Field[] fields = cls.getDeclaredFields();

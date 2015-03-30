@@ -12,7 +12,5 @@ public interface ILayer {
 	
 	boolean ContainsGrid();
 	Container loadGrid(ViewType type, Container container);
-	
-	void setId(int id);
-	int getId();
+
 }

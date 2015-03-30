@@ -1,6 +1,7 @@
 package eldunari.form.interfaces;
 
 import java.awt.Component;
+import java.awt.Point;
 
 import eldunari.form.enumation.Orientation;
 
@@ -30,5 +31,9 @@ public interface IComponent {
 	public Object getValue();
 	public void setValue(Object obj);
 
+	public Point getLocation();
+	public Point getLocationXY();		
+	public void setLocation(int x, int y);
+	
 	
 }

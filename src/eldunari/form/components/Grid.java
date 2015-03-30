@@ -1,8 +1,7 @@
 package eldunari.form.components;
 import java.awt.Component;
-import java.util.ArrayList;
+import java.awt.Point;
 
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
 import eldunari.form.classes.GridModel;
@@ -21,9 +20,7 @@ public class Grid<T> extends JTable implements IComponent{
 	private int maxWidth;
 	private int minWidth;
 	private int maxHeight;
-	private int minHeight;
-	
-	
+	private int minHeight;	
 	
 	public Grid(){
 
@@ -36,15 +33,10 @@ public class Grid<T> extends JTable implements IComponent{
 	}
 	public Grid(GridModel dm){
 		super(dm);
-	}
-	
+	}	
 
-	public void reload(Object[][] rows, Object[] columns){
-		
-	}
-
-	public JScrollPane getTableWithHead(){
-		JScrollPane scp = new JScrollPane(this);
+	public ScrollPane getTableWithHead(){
+		ScrollPane scp = new ScrollPane(this,this);
 		scp.setSize(this.getSize());
 		scp.setLocation(this.getLocation());
 		return scp;
@@ -59,6 +51,13 @@ public class Grid<T> extends JTable implements IComponent{
 		return tag;
 	}	
 
+	public Point getLocationXY(){
+		return super.getLocation();
+	}	
+	
+	public void setLocation(int x, int y){
+		super.setLocation(x, y);
+	}
 	public void setLocation(Component com, Orientation orientation){
 		this.orientation = orientation;
 		this.neighborComponent = com;

@@ -22,7 +22,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 
-public abstract class Connector {
+public class Connector{
 	String VALIDATOR_PACKAGE = "mpad.contracts.validator";
 	String TRIGGER_PACKAGE = "mpad.contracts.trigger";
 
@@ -119,7 +119,7 @@ public abstract class Connector {
 				fields[i].setAccessible(true);
 				Column column = fields[i].getAnnotation(Column.class);
 				if(column != null){
-					
+
 					if(ResultSetContains(result,column.name())){
 						fields[i] = setFieldValue(fields[i],result.getString(column.name()),obj);
 					}
@@ -138,9 +138,9 @@ public abstract class Connector {
 		}catch(Exception ex){
 			return false;
 		}
-		
+
 	}
-	
+
 	public Field setFieldValue(Field field,String value,IObject obj) {
 		try {
 			Column column = field.getAnnotation(Column.class);
@@ -172,11 +172,15 @@ public abstract class Connector {
 				}else if(type.equals(short.class) || type.equals(Short.class)){
 					field.setShort(obj, Short.parseShort(value));
 				}else if(type.equals(Date.class)){
-					long val = Long.parseLong(value);
-					field.set(obj, new Date(val));
+					if(value != null){
+						long val = Long.parseLong(value);
+						field.set(obj, new Date(val));
+					}
 				}else if(type.equals(Calendar.class)){
-					long val = Long.parseLong(value);
-					field.set(obj, new Date(val));
+					if(value != null){
+						long val = Long.parseLong(value);
+						field.set(obj, new Date(val));
+					}
 				}else{
 					field.set(obj, value);
 				}
@@ -235,7 +239,7 @@ public abstract class Connector {
 			}else if(typecls.equals(String.class)){
 				field.set(obj, value.toString());
 			}else if(typecls.equals(Calendar.class)){
-//				String calstr = value.toString();
+				//				String calstr = value.toString();
 				field.set(obj, null);
 			}else if(typecls.equals(double.class)){
 				field.set(obj, Double.parseDouble(value.toString()));

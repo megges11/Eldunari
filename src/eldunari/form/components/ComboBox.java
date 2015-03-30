@@ -1,6 +1,7 @@
 package eldunari.form.components;
 
 import java.awt.Component;
+import java.awt.Point;
 
 import javax.swing.JComboBox;
 
@@ -25,6 +26,13 @@ public class ComboBox<T> extends JComboBox<T> implements IComponent{
 	}
 	public String getTag(){
 		return this.tag;
+	}
+	public Point getLocationXY(){
+		return super.getLocation();
+	}	
+	
+	public void setLocation(int x, int y){
+		super.setLocation(x, y);
 	}
 	@Override
 	public void setLocation(Component com, Orientation orientation) {

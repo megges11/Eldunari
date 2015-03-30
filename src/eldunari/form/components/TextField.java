@@ -1,6 +1,7 @@
 package eldunari.form.components;
 
 import java.awt.Component;
+import java.awt.Point;
 
 import javax.swing.JTextField;
 
@@ -21,6 +22,14 @@ public class TextField extends JTextField implements IComponent{
 	private int minWidth;
 	private int maxHeight;
 	private int minHeight;
+	
+	public Point getLocationXY(){
+		return super.getLocation();
+	}	
+	
+	public void setLocation(int x, int y){
+		super.setLocation(x, y);
+	}
 	
 	public void setLocation(Component com, Orientation orientation){
 		this.orientation = orientation;
