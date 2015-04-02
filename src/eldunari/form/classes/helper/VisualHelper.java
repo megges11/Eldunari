@@ -1,15 +1,12 @@
-package eldunari.form.classes;
+package eldunari.form.classes.helper;
 
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.lang.reflect.Field;
-import java.util.Date;
 
 import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
 
 import eldunari.form.enumation.Orientation;
 import eldunari.form.enumation.ViewType;
@@ -20,8 +17,8 @@ import eldunari.general.classes.ClassFinder;
 import eldunari.general.classes.OutputHandler;
 import eldunari.general.enumeration.OutputType;
 import eldunari.origin.annotation.Column;
-import eldunari.origin.annotation.DataModel;
 import eldunari.origin.interfaces.IObject;
+import eldunari.form.annotation.DataModel;
 import eldunari.form.components.Form;
 
 public class VisualHelper {
@@ -46,9 +43,9 @@ public class VisualHelper {
 						}
 						if(layer != null){
 							if(type == ViewType.GridViewSelect){
-								return layer.getContainer(dimension,frame,false);
+								return layer.getContainer(frame,false);
 							}else{
-								return layer.getContainer(dimension, frame, true);
+								return layer.getContainer(frame, true);
 							}				
 						}
 					}
@@ -66,7 +63,7 @@ public class VisualHelper {
 								layer = (ILayer) obj;
 							}
 							if(layer != null){
-								return layer.getContainer(dimension,frame,type);
+								return layer.getContainer(frame.getContentPane(),type);
 							}
 						}
 					}
@@ -106,28 +103,9 @@ public class VisualHelper {
 					if(col != null){
 						String col_name = col.name();
 
-						Component component = getElementByName("["+col_name+"]",container);
+						IComponent component = getElementByTag(col_name,container);
 						if(component != null){
-							Class<?> comClass = component.getClass();
-
-							if(comClass.equals(JTextField.class) && field.getType().equals(String.class)){
-								JTextField tfCom = (JTextField)component;
-								tfCom.setText(field.get(obj).toString());
-
-							}else if(comClass.equals(JTextField.class) && field.getType().equals(int.class)){
-								JTextField tfCom = (JTextField)component;
-								tfCom.setText(field.getInt(obj)+"");
-
-							}else if(comClass.equals(JTextField.class) && field.getType().equals(Date.class)){
-								JTextField tfCom = (JTextField)component;
-								Date cal = new Date(field.getLong(obj));					
-								tfCom.setText(cal.toString());
-
-							}else if(comClass.equals(JTextArea.class) && field.getType().equals(String.class)){
-								JTextArea tfCom = (JTextArea)component;
-								tfCom.setText(field.get(obj).toString());
-
-							}
+							component.setValue(field.get(obj));							
 						}
 					}
 				}
@@ -164,7 +142,7 @@ public class VisualHelper {
 		return null;
 	}
 
-	public static Component getElementByName(String name, Container container){
+	public static IComponent getElementByTag(String name, Container container){
 		Component[] components = container.getComponents();
 		for(Component com : components){
 			if(com instanceof IComponent){
@@ -173,7 +151,7 @@ public class VisualHelper {
 					String com_name = compo.getTag();
 					if(com_name != null){
 						if(com_name.equalsIgnoreCase(name)){
-							return (Component)compo;
+							return compo;
 						}
 					}
 				}
@@ -183,15 +161,9 @@ public class VisualHelper {
 	}
 
 	public static Object getElementValue(String name, Container container){
-		Component component = getElementByName(name,container);
+		IComponent component = getElementByTag(name,container);
 		if(component != null){
-			if(component.getClass().equals(JTextField.class)){
-				JTextField tfCom = (JTextField)component;
-				return tfCom.getText();	
-			}else if(component.getClass().equals(JTextArea.class)){
-				JTextArea tfCom = (JTextArea)component;
-				return tfCom.getText();			
-			}
+			return component.getValue();
 		}
 		return null;
 	}
@@ -211,7 +183,7 @@ public class VisualHelper {
 		return Form.DEFAULT_COMPONENT_START_LOCATION;
 	}
 
-	public static Point GetPosition(Component com, Orientation orientation){
+	public static Point GetPosition(IComponent com, Orientation orientation){
 		if(com != null){
 			Point relation = com.getLocation();
 			if(relation != null){

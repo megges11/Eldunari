@@ -1,4 +1,5 @@
-package eldunari.form.classes;
+package eldunari.form.classes.helper;
+import eldunari.form.classes.MenuItem;
 import eldunari.general.classes.MethodFinder;
 
 import java.awt.event.ActionEvent;

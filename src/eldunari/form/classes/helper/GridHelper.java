@@ -1,4 +1,4 @@
-package eldunari.form.classes;
+package eldunari.form.classes.helper;
 
 import eldunari.general.classes.OutputHandler;
 import eldunari.general.enumeration.OutputType;

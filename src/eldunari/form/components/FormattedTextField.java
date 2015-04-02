@@ -5,7 +5,7 @@ import java.awt.Point;
 import javax.swing.JFormattedTextField;
 import javax.swing.text.MaskFormatter;
 
-import eldunari.form.classes.VisualHelper;
+import eldunari.form.classes.helper.VisualHelper;
 import eldunari.form.enumation.Orientation;
 import eldunari.form.interfaces.IComponent;
 
@@ -34,7 +34,7 @@ public class FormattedTextField extends JFormattedTextField implements IComponen
 	public void setLocation(int x, int y){
 		super.setLocation(x, y);
 	}
-	public void setLocation(Component com, Orientation orientation){
+	public void setLocation(IComponent com, Orientation orientation){
 		this.setLocation(VisualHelper.GetPosition(com,orientation));
 	}
 	@Override
@@ -50,7 +50,7 @@ public class FormattedTextField extends JFormattedTextField implements IComponen
 		return null;
 	}
 	@Override
-	public Component getNeighbor() {
+	public IComponent getNeighbor() {
 		return null;
 	}
 	@Override
@@ -107,6 +107,16 @@ public class FormattedTextField extends JFormattedTextField implements IComponen
 	}
 	public boolean isLockedY(){
 		return locky;
+	}
+	private String neighborName;
+	public void setNeighborString(String value){
+		neighborName = value;
+	}
+	public String getNeightborName(){
+		return neighborName;
+	}
+	public void setOrientation(Orientation orientation){
+//		this.orientation = orientation;
 	}
 
 }

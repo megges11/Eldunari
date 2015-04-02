@@ -15,13 +15,14 @@ import eldunari.origin.interfaces.IObject;
 public class SqliteConnector extends Connector implements IConnectable{
 
 	private ArrayList<String> errors = new ArrayList<String>();
+	private String connectionString = "jdbc:sqlite:name.db";
 	
 	@Override
 	public Connection getConnection() {
 		Connection con = null;
 		try {
 			Class.forName("org.sqlite.JDBC");			
-			con = DriverManager.getConnection("jdbc:sqlite:name.db");
+			con = DriverManager.getConnection(connectionString);
 			if(errors.size()!=0){
 				errors.clear();
 			}
@@ -41,14 +42,15 @@ public class SqliteConnector extends Connector implements IConnectable{
 		}
 	}
 	public int executeUpdate(String sql){
+		Connection con = getConnection();
 		try{
-			Connection con = getConnection();
 			Statement stmt = con.createStatement();
 			int result = stmt.executeUpdate(sql);
 			stmt.close();
 			con.close();
 			return result;	
 		}catch(Exception ex){
+			ex.printStackTrace();
 			return 0;
 		}
 	}
@@ -113,6 +115,14 @@ public class SqliteConnector extends Connector implements IConnectable{
 	@Override
 	public boolean hasError() {
 		return (errors.size() != 0);
+	}
+
+	public String getConnectionString() {
+		return connectionString;
+	}
+
+	public void setConnectionString(String connectionString) {
+		this.connectionString = connectionString;
 	}	
 	
 	

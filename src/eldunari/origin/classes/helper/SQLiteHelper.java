@@ -1,15 +1,20 @@
 package eldunari.origin.classes.helper;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 
+import eldunari.general.annotation.Definition;
 import eldunari.origin.annotation.Column;
 import eldunari.origin.annotation.DefaultValue;
+import eldunari.origin.annotation.Format;
 import eldunari.origin.annotation.Precision;
 import eldunari.origin.annotation.PrimaryKey;
 import eldunari.origin.annotation.Relation;
+import eldunari.origin.annotation.Required;
 import eldunari.origin.annotation.Table;
 import eldunari.origin.enumeration.ConstraintAction;
 import eldunari.origin.enumeration.ConstraintRule;
@@ -42,30 +47,46 @@ public class SQLiteHelper {
 		}
 		String sql = "CREATE TABLE IF NOT EXISTS "+getTableName(cls)+"(";
 		Field[] fields = cls.getDeclaredFields();
-		for(int i = 0; i<fields.length ; i++){
+
+		HashMap<String,PrimaryKey> primaryKeyCols = new HashMap<String,PrimaryKey>();
+		HashMap<Column,ArrayList<Relation>> relationCols = new HashMap<Column,ArrayList<Relation>>();
+
+		for(int i = 0; i<fields.length ; i++){			
 			Field field = fields[i];
 			field.setAccessible(true);
-			Column column = field.getAnnotation(Column.class);
-			if(column!= null){
-				String fieldsql = column.name();
-				fieldsql += getColumnType(field);
-				fieldsql += getPrecision(field);	
-				fieldsql += (column.nullable()) ? " NULL" : " NOT NULL" ;
-				fieldsql += getDefaultValue(field);
+			ColumnDefinition definition = getDefinition(cls,field);
+			if(definition.hasErrors()){
+				return new SQLiteHelperResult(false,"",definition.getError());
+			}
+			if(definition.getColumn()!= null){
+				String fieldsql = definition.getColumn().name();
+				fieldsql += getColumnType(definition.getColumn(), field);
+				fieldsql += getPrecision(definition.getPrecision());
+				fieldsql += getNullable(definition.getRequired());
+				//fieldsql += (definition.getColumn().nullable()) ? " NULL" : " NOT NULL" ;
+				fieldsql += getDefaultValue(definition.getDefaultValue());			
 				fieldsql += (i < fields.length-1) ? "," : "" ;
 				sql += fieldsql;
+				if(definition.getPrimaryKey()!= null){
+					//System.err.println(cls.getSimpleName()+" "+definition.getColumn().name());
+					primaryKeyCols.put(definition.getColumn().name(),definition.getPrimaryKey());
+				}
+				if(!definition.getRelations().isEmpty()){
+					relationCols.put(definition.getColumn(), definition.getRelations());
+				}
 			}
 		}
-		String primaries = getPrimaryKeys();
+		String primaries = getPrimaryKeys(primaryKeyCols);
 
 		if(!primaries.isEmpty()){
 			sql+=","+primaries;
 		}
-		String foreign = getForeignKeys(fields);
+		String foreign = getForeignKeys(relationCols);
 		if(!foreign.isEmpty()){
-			sql+=getForeignKeys(fields);	
+			sql+=foreign;	
 		}
 		sql+=");";
+		System.out.println(sql);
 		return new SQLiteHelperResult(true,sql);
 	}
 
@@ -161,8 +182,11 @@ public class SQLiteHelper {
 				where += column.name()+"="+getFieldValue(field,toUpdate);
 			}
 		}
-		value += where;
-		System.out.println(value);
+		if(fieldcount != 0){
+			value += where;	
+		}else{
+			value="";
+		}
 		return new SQLiteHelperResult(true,value);
 	}	
 
@@ -214,9 +238,7 @@ public class SQLiteHelper {
 	}
 
 
-	private String getDefaultValue(Field field){
-		field.setAccessible(true);
-		DefaultValue defval = field.getAnnotation(DefaultValue.class);
+	private String getDefaultValue(DefaultValue defval){
 		String val = "";
 		if(defval != null){
 			if(defval.value() != null && !defval.value().isEmpty()){
@@ -226,9 +248,7 @@ public class SQLiteHelper {
 		}
 		return val;
 	}
-	private String getPrecision(Field field) {
-		field.setAccessible(true);
-		Precision prec = field.getAnnotation(Precision.class); 				
+	private String getPrecision(Precision prec) {		
 		if(prec != null){
 			int[] val = prec.value();
 			if(val.length >= 2){
@@ -239,8 +259,17 @@ public class SQLiteHelper {
 		}
 		return "";
 	}
-	private String getColumnType(Field field) {
-		Column column = (field.getAnnotation(Column.class)!= null) ? field.getAnnotation(Column.class) : null ; 				
+	private String getNullable(Required required) {		
+		if(required != null){
+			if(required.value()){
+				return " NOT NULL ";
+			}else{
+				return " NULL ";
+			}
+		}
+		return "";
+	}
+	private String getColumnType(Column column,Field field) { 				
 		DataType datatype = DataType.AUTO;
 		if(column != null){
 			datatype = column.type();
@@ -275,22 +304,18 @@ public class SQLiteHelper {
 		}
 		return DataType.AUTO.getValue();
 	}
-	private String getPrimaryKeys(){
-		Field[] fields = cls.getDeclaredFields();
+	private String getPrimaryKeys(HashMap<String,PrimaryKey> primaryKeyCols){
 		String sql = "";
 		int primarycount = 0;
-		for(int i = 0; i< fields.length;i++){
-			Field field = fields[i];
-			field.setAccessible(true);
-			PrimaryKey primary = field.getAnnotation(PrimaryKey.class);
-			Column column= field.getAnnotation(Column.class);
-			if(column!= null && primary != null){
+		for(String key : primaryKeyCols.keySet()){
+			PrimaryKey primary = primaryKeyCols.get(key);
+			if(key!= null && primary != null){
 				if(primary.value()){
 					if(primarycount!=0){
 						sql+=",";
 					}
 					primarycount++;
-					sql+=column.name();
+					sql+=key;
 				}
 			}
 		}
@@ -300,23 +325,24 @@ public class SQLiteHelper {
 		return sql;
 	}
 
-	private String getForeignKeys(Field[] fields){
+	private String getForeignKeys(HashMap<Column,ArrayList<Relation>> relationCols){
 		ArrayList<String> relations = new ArrayList<String>();
-		for(Field field : fields){
-			field.setAccessible(true);
-			Relation rl = field.getAnnotation(Relation.class);
-			if(rl != null){
-				String colname = (field.getAnnotation(Column.class) != null) ? field.getAnnotation(Column.class).name() : null;
-				if(colname != null){
-					String constraint = "";
-					String rule = "";
-					if(!rl.name().equals("")){
-						constraint = "CONSTRAINT "+rl.name()+" ";
+
+		for(Column column : relationCols.keySet()){
+			for(Relation rl : relationCols.get(column)){
+				if(rl != null){
+					String colname = column.name();
+					if(colname != null){
+						String constraint = "";
+						String rule = "";
+						if(!rl.name().equals("")){
+							constraint = "CONSTRAINT "+rl.name()+" ";
+						}
+						if(rl.action() != ConstraintAction.NONE && rl.rule() != ConstraintRule.NONE){
+							rule = rl.action().getValue()+" "+rl.rule().getValue();
+						}
+						relations.add(constraint+"FOREIGN KEY("+colname+") REFERENCES "+getTableName(rl.table())+"("+rl.field()+") "+rule);
 					}
-					if(rl.action() != ConstraintAction.NONE && rl.rule() != ConstraintRule.NONE){
-						rule = rl.action().getValue()+" "+rl.rule().getValue();
-					}
-					relations.add(constraint+"FOREIGN KEY("+colname+") REFERENCES "+getTableName(rl.table())+"("+rl.field()+") "+rule);
 				}
 			}
 		}
@@ -412,4 +438,61 @@ public class SQLiteHelper {
 		}
 		return "No type found change database type or Attribute type to match field and column";
 	}
+
+	private ColumnDefinition getDefinition(Class<? extends IObject> cls, Field field){
+		ColumnDefinition definition = new ColumnDefinition();
+		field.setAccessible(true);
+
+		Definition define = cls.getAnnotation(Definition.class);
+		if(define != null){
+			for(Class<?> clazz : define.value()){
+
+				Field[] fields = clazz.getDeclaredFields();
+				for(Field f : fields){
+					if(f.getName().equals(field.getName())){
+						Annotation[] annotations = f.getDeclaredAnnotations();
+						for(Annotation anno : annotations){
+							if(anno.annotationType().equals(Column.class)){
+								definition.setColumn((Column)anno);
+							}else if(anno.annotationType().equals(PrimaryKey.class)){
+								definition.setPrimaryKey((PrimaryKey)anno);
+							}else if(anno.annotationType().equals(DefaultValue.class)){
+								definition.setDefaultValue((DefaultValue)anno);
+							}else if(anno.annotationType().equals(Format.class)){
+								definition.setFormat((Format)anno);
+							}else if(anno.annotationType().equals(Precision.class)){
+								definition.setPrecision((Precision)anno);
+							}else if(anno.annotationType().equals(Relation.class)){
+								definition.addRelation((Relation)anno);
+							}else if(anno.annotationType().equals(Required.class)){
+								definition.setRequired((Required)anno);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		Annotation[] annotations = field.getAnnotations();
+		for(Annotation anno : annotations){
+			if(anno.annotationType().equals(Column.class)){
+				definition.setColumn((Column)anno);
+			}else if(anno.annotationType().equals(PrimaryKey.class)){
+				definition.setPrimaryKey((PrimaryKey)anno);
+			}else if(anno.annotationType().equals(DefaultValue.class)){
+				definition.setDefaultValue((DefaultValue)anno);
+			}else if(anno.annotationType().equals(Format.class)){
+				definition.setFormat((Format)anno);
+			}else if(anno.annotationType().equals(Precision.class)){
+				definition.setPrecision((Precision)anno);
+			}else if(anno.annotationType().equals(Relation.class)){
+				definition.addRelation((Relation)anno);
+			}else if(anno.annotationType().equals(Required.class)){
+				definition.setRequired((Required)anno);
+			}
+		}
+
+		return definition;
+	}
+
 }

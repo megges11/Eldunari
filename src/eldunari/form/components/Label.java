@@ -5,7 +5,7 @@ import java.awt.Point;
 
 import javax.swing.JLabel;
 
-import eldunari.form.classes.VisualHelper;
+import eldunari.form.classes.helper.VisualHelper;
 import eldunari.form.enumation.Orientation;
 import eldunari.form.interfaces.IComponent;
 
@@ -14,7 +14,7 @@ public class Label extends JLabel implements IComponent{
 
 	private String tag;
 	private Orientation orientation;
-	private Component neighborComponent;
+	private IComponent neighborComponent;
 	private int percentWidth;
 	private int percentHeight;
 	
@@ -44,7 +44,7 @@ public class Label extends JLabel implements IComponent{
 		super.setLocation(x, y);
 	}
 	@Override
-	public void setLocation(Component com, Orientation orientation) {
+	public void setLocation(IComponent com, Orientation orientation) {
 		this.orientation = orientation;
 		this.neighborComponent = com;
 		this.setLocation(VisualHelper.GetPosition(com, orientation));
@@ -56,7 +56,7 @@ public class Label extends JLabel implements IComponent{
 	}
 
 	@Override
-	public Component getNeighbor() {
+	public IComponent getNeighbor() {
 		return neighborComponent;
 	}
 
@@ -102,7 +102,6 @@ public class Label extends JLabel implements IComponent{
 		this.minHeight = height;
 		this.minWidth = width;	
 	}
-
 	
 	public void setLockedX(boolean value){
 		this.lockx = value;
@@ -123,5 +122,25 @@ public class Label extends JLabel implements IComponent{
 	public Object getValue(){
 		return this.getText();
 	}
+	@Override
+	public void setEditable(boolean value) {
+		this.setEnabled(value);
+	}
+	@Override
+	public boolean isEditable() {
+		return this.isEnabled();
+	}
+
+	private String neighborName;
+	public void setNeighborString(String value){
+		neighborName = value;
+	}
+	public String getNeightborName(){
+		return neighborName;
+	}
+	public void setOrientation(Orientation orientation){
+		this.orientation = orientation;
+	}
 	
 }
+

@@ -1,6 +1,7 @@
 package eldunari.form.interfaces;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Point;
 
 import eldunari.form.enumation.Orientation;
@@ -8,9 +9,13 @@ import eldunari.form.enumation.Orientation;
 public interface IComponent {
 	void setTag(String value);
 	String getTag();
-	void setLocation(Component com, Orientation orientation);
+	void setLocation(IComponent com, Orientation orientation);
 	Orientation getOrientation();
-	Component getNeighbor();
+	IComponent getNeighbor();
+	
+	void setNeighborString(String value);
+	String getNeightborName();
+	void setOrientation(Orientation orientation);
 	
 	void setSizePercent(Component parent,int percentWidth,int percentHeight);
 	int getPercentWidth();
@@ -23,17 +28,25 @@ public interface IComponent {
 	int getMinHeight();
 	int getMaxHeight();
 	
-	public void setLockedX(boolean value);
-	public void setLockedY(boolean value);
-	public boolean isLockedX();
-	public boolean isLockedY();
+	void setSize(int width, int height);
+	Dimension getSize();
 	
-	public Object getValue();
-	public void setValue(Object obj);
+	void setLockedX(boolean value);
+	void setLockedY(boolean value);
+	boolean isLockedX();
+	boolean isLockedY();
+	
+	Object getValue();
+	void setValue(Object obj);
 
-	public Point getLocation();
-	public Point getLocationXY();		
-	public void setLocation(int x, int y);
+	Point getLocation();
+	Point getLocationXY();		
+	void setLocation(int x, int y);
 	
+	void setName(String value);
+	String getName();
+	
+	void setEditable(boolean value);
+	boolean isEditable();
 	
 }

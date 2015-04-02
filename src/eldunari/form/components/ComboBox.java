@@ -5,7 +5,7 @@ import java.awt.Point;
 
 import javax.swing.JComboBox;
 
-import eldunari.form.classes.VisualHelper;
+import eldunari.form.classes.helper.VisualHelper;
 import eldunari.form.enumation.Orientation;
 import eldunari.form.interfaces.IComponent;
 
@@ -35,7 +35,7 @@ public class ComboBox<T> extends JComboBox<T> implements IComponent{
 		super.setLocation(x, y);
 	}
 	@Override
-	public void setLocation(Component com, Orientation orientation) {
+	public void setLocation(IComponent com, Orientation orientation) {
 		this.setLocation(VisualHelper.GetPosition(com,orientation));
 	}
 	@Override
@@ -43,7 +43,7 @@ public class ComboBox<T> extends JComboBox<T> implements IComponent{
 		return null;
 	}
 	@Override
-	public Component getNeighbor() {
+	public IComponent getNeighbor() {
 		return null;
 	}
 	@Override
@@ -106,5 +106,15 @@ public class ComboBox<T> extends JComboBox<T> implements IComponent{
 	}
 	public Object getValue(){
 		return this.getSelectedIndex();
+	}
+	private String neighborName;
+	public void setNeighborString(String value){
+		neighborName = value;
+	}
+	public String getNeightborName(){
+		return neighborName;
+	}
+	public void setOrientation(Orientation orientation){
+//		this.orientation = orientation;
 	}
 }

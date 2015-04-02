@@ -1,9 +1,10 @@
 package eldunari.origin.classes;
+import eldunari.form.annotation.DataModel;
 import eldunari.general.classes.ClassFinder;
 import eldunari.general.classes.OutputHandler;
 import eldunari.general.enumeration.OutputType;
 import eldunari.origin.annotation.Column;
-import eldunari.origin.annotation.DataModel;
+import eldunari.origin.annotation.Relation;
 import eldunari.origin.classes.helper.OrderByDefinition;
 import eldunari.origin.classes.helper.QueryResult;
 import eldunari.origin.classes.helper.SQLiteHelper;
@@ -23,8 +24,9 @@ import java.util.Date;
 
 
 public class Connector{
-	String VALIDATOR_PACKAGE = "mpad.contracts.validator";
-	String TRIGGER_PACKAGE = "mpad.contracts.trigger";
+	
+	public String VALIDATOR_PACKAGE = "mpad.contracts.validator";
+	public String TRIGGER_PACKAGE = "mpad.contracts.trigger";
 
 	public boolean Initialize(IConnectable connector,Class<? extends IObject> cls) throws Exception{	
 		SQLiteHelper helper = new SQLiteHelper(cls);
@@ -50,7 +52,6 @@ public class Connector{
 				String error = "";
 				for(String err:validator.Error()){
 					error += err+"\n";
-					//					this.error.add(err);
 				}
 				OutputHandler.Message(OutputType.Error,error);
 				return false;
@@ -80,7 +81,7 @@ public class Connector{
 	public boolean Update(IConnectable connector, IObject obj, IObject toUpdate){
 		SQLiteHelper helper = new SQLiteHelper(obj);
 		SQLiteHelperResult result = helper.getUpdateQuery(toUpdate);
-		if(result.isSuccess()){
+		if(result.isSuccess() && !result.getValue().isEmpty()){
 			return connector.executeUpdate(result.getValue())!=0;
 		}
 		return false;
@@ -154,31 +155,31 @@ public class Connector{
 			if(column.type() == DataType.AUTO ){
 				type = field.getType();
 			}
-			if(type != null ){
+			if(type != null && !value.isEmpty()){				
 				if(type.equals(int.class) || type.equals(Integer.class)){
-					field.setInt(obj,Integer.parseInt(value));
+					field.setInt(obj,Integer.parseInt(value+""));
 				}else if(type.equals(boolean.class) || type.equals(Boolean.class)){
-					field.setBoolean(obj,Boolean.parseBoolean(value));
+					field.setBoolean(obj,Boolean.parseBoolean(value+""));
 				}else if(type.equals(byte.class) || type.equals(Byte.class)){
-					field.setByte(obj, Byte.parseByte(value));					
+					field.setByte(obj, Byte.parseByte(value+""));					
 				}else if(type.equals(char.class)){
-					field.setChar(obj, value.charAt(0));
+					field.setChar(obj, (value+"").charAt(0));
 				}else if(type.equals(double.class) || type.equals(Double.class)){
-					field.setDouble(obj, Double.parseDouble(value));
+					field.setDouble(obj, Double.parseDouble(value+""));
 				}else if(type.equals(float.class) || type.equals(Float.class)){
-					field.setFloat(obj, Float.parseFloat(value));
+					field.setFloat(obj, Float.parseFloat(value+""));
 				}else if(type.equals(long.class) || type.equals(Long.class)){
-					field.setLong(obj,Long.parseLong(value));
+					field.setLong(obj,Long.parseLong(value+""));
 				}else if(type.equals(short.class) || type.equals(Short.class)){
-					field.setShort(obj, Short.parseShort(value));
+					field.setShort(obj, Short.parseShort(value+""));
 				}else if(type.equals(Date.class)){
 					if(value != null){
-						long val = Long.parseLong(value);
+						long val = Long.parseLong(value+"");
 						field.set(obj, new Date(val));
 					}
 				}else if(type.equals(Calendar.class)){
 					if(value != null){
-						long val = Long.parseLong(value);
+						long val = Long.parseLong(value+"");
 						field.set(obj, new Date(val));
 					}
 				}else{
@@ -186,7 +187,7 @@ public class Connector{
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return field;
 	}
@@ -227,28 +228,16 @@ public class Connector{
 		return null;		
 	}
 
-	public static Field setFieldValue(Field field, Object obj, Object value){
-		try{
-			Class<?> typecls = field.getType();
-			if(value.getClass() == String.class){
-				String val = (String) value;
-				if(val.isEmpty()){ return field; }
+	public static ArrayList<RelationInfo> getRelations(Class<? extends IObject> cls){
+		ArrayList<RelationInfo> relations = new ArrayList<RelationInfo>();
+		Field[] fields = cls.getDeclaredFields();
+		for(Field field : fields){
+			field.setAccessible(true);
+			Relation rel = field.getAnnotation(Relation.class);
+			if(rel != null){
+				relations.add(new RelationInfo(rel.table(),rel.field(),rel.name(),rel.action(),rel.rule()));
 			}
-			if(typecls.equals(int.class)){
-				field.set(obj,Integer.parseInt((String) value));
-			}else if(typecls.equals(String.class)){
-				field.set(obj, value.toString());
-			}else if(typecls.equals(Calendar.class)){
-				//				String calstr = value.toString();
-				field.set(obj, null);
-			}else if(typecls.equals(double.class)){
-				field.set(obj, Double.parseDouble(value.toString()));
-			}else{
-				field.set(obj, value);
-			}
-		}catch(Exception ex){
-			ex.printStackTrace();
 		}
-		return field;
+		return relations;
 	}
 }

@@ -1,11 +1,12 @@
 package eldunari.form.components;
 import java.awt.Component;
 import java.awt.Point;
+import java.util.ArrayList;
 
 import javax.swing.JTable;
 
 import eldunari.form.classes.GridModel;
-import eldunari.form.classes.VisualHelper;
+import eldunari.form.classes.helper.VisualHelper;
 import eldunari.form.enumation.Orientation;
 import eldunari.form.interfaces.IComponent;
 
@@ -15,24 +16,35 @@ public class Grid<T> extends JTable implements IComponent{
 	private int percentHeight;
 	private int percentWidth;
 	private Orientation orientation;
-	private Component neighborComponent;	
+	private IComponent neighborComponent;	
+	
+	private final ArrayList<T> mItems;
+	private final Class<T> cls;
 	
 	private int maxWidth;
 	private int minWidth;
 	private int maxHeight;
 	private int minHeight;	
 	
-	public Grid(){
-
+	public Grid(Class<T> cls){
+		this.cls = cls;
+		this.mItems = null;
 	}
-	public Grid(int numRows, int numColumns){
+	public Grid(Class<T> cls,int numRows, int numColumns){
 		super(numRows,numColumns);
+		this.cls = cls;
+		mItems = new ArrayList<T>(numRows);
 	}
-	public Grid(Object[][] rows, Object[] columns){
+	public Grid(Class<T> cls,ArrayList<T> items,Object[][] rows, Object[] columns){
 		super(rows,columns);
+		this.cls = cls;
+		mItems = items;
+		
 	}
-	public Grid(GridModel dm){
+	public Grid(Class<T> cls, GridModel<T> dm){
 		super(dm);
+		this.cls = cls;
+		mItems = dm.getItems();
 	}	
 
 	public ScrollPane getTableWithHead(){
@@ -58,7 +70,7 @@ public class Grid<T> extends JTable implements IComponent{
 	public void setLocation(int x, int y){
 		super.setLocation(x, y);
 	}
-	public void setLocation(Component com, Orientation orientation){
+	public void setLocation(IComponent com, Orientation orientation){
 		this.orientation = orientation;
 		this.neighborComponent = com;
 		this.setLocation(VisualHelper.GetPosition(com,orientation));
@@ -69,7 +81,7 @@ public class Grid<T> extends JTable implements IComponent{
 	}
 
 	@Override
-	public Component getNeighbor() {
+	public IComponent getNeighbor() {
 		return neighborComponent;
 	}
 	@Override
@@ -131,6 +143,31 @@ public class Grid<T> extends JTable implements IComponent{
 	public void setValue(Object obj){}
 	public Object getValue(){
 		return null;
+	}
+	public ArrayList<T> getItems() {
+		return mItems;
+	}
+	public Class<T> getCls() {
+		return cls;
+	}
+	@Override
+	public void setEditable(boolean value) {
+		this.setEnabled(value);
+	}
+	@Override
+	public boolean isEditable() {
+		return this.isEnabled();
+	}
+
+	private String neighborName;
+	public void setNeighborString(String value){
+		neighborName = value;
+	}
+	public String getNeightborName(){
+		return neighborName;
+	}
+	public void setOrientation(Orientation orientation){
+		this.orientation = orientation;
 	}
 
 }

@@ -5,7 +5,7 @@ import java.awt.Point;
 
 import javax.swing.JTextField;
 
-import eldunari.form.classes.VisualHelper;
+import eldunari.form.classes.helper.VisualHelper;
 import eldunari.form.enumation.Orientation;
 import eldunari.form.interfaces.IComponent;
 
@@ -14,9 +14,12 @@ public class TextField extends JTextField implements IComponent{
 
 	private String tag;
 	private Orientation orientation;
-	private Component neighborComponent;
+	private IComponent neighborComponent;
 	private int percentWidth;
 	private int percentHeight;
+	
+	private boolean lockx;
+	private boolean locky;
 	
 	private int maxWidth;
 	private int minWidth;
@@ -31,7 +34,7 @@ public class TextField extends JTextField implements IComponent{
 		super.setLocation(x, y);
 	}
 	
-	public void setLocation(Component com, Orientation orientation){
+	public void setLocation(IComponent com, Orientation orientation){
 		this.orientation = orientation;
 		this.neighborComponent = com;
 		this.setLocation(VisualHelper.GetPosition(com,orientation));
@@ -49,7 +52,7 @@ public class TextField extends JTextField implements IComponent{
 		return orientation;
 	}
 	@Override
-	public Component getNeighbor(){
+	public IComponent getNeighbor(){
 		return neighborComponent;
 	}
 	@Override
@@ -89,10 +92,7 @@ public class TextField extends JTextField implements IComponent{
 	public void setMin(int width, int height) {
 		this.minHeight = height;
 		this.minWidth = width;	
-	}
-	
-	private boolean lockx;
-	private boolean locky;	
+	}	
 	
 	public void setLockedX(boolean value){
 		this.lockx = value;
@@ -108,9 +108,21 @@ public class TextField extends JTextField implements IComponent{
 	}
 
 	public void setValue(Object obj){
-		this.setText((String)obj);
+		if(obj != null){
+			this.setText(String.valueOf(obj));
+		}		
 	}
 	public Object getValue(){
 		return this.getText();
+	}
+	private String neighborName;
+	public void setNeighborString(String value){
+		neighborName = value;
+	}
+	public String getNeightborName(){
+		return neighborName;
+	}
+	public void setOrientation(Orientation orientation){
+		this.orientation = orientation;
 	}
 }

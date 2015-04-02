@@ -27,17 +27,18 @@ public class RequiredTables {
 		return required.remove(cls);
 	}
 	
-	public void Initialize(boolean sqlite,String dbname) throws Exception{
+	public void Initialize(boolean sqlite,String constring) throws Exception{
 		if(required == null){
 			required = new ArrayList<Class<? extends IObject>>();
 		}
 		IConnectable con = null;
 		Connector connect = new Connector();
 		if(sqlite){
-			con = new SqliteConnector();
+			con = new SqliteConnector();			
 		}else{
 			con = new SqlConnector();
 		}
+		con.setConnectionString(constring);
 		for(Class<? extends IObject> cls : required){
 			connect.Initialize(con,cls);
 			if(con.hasError()){

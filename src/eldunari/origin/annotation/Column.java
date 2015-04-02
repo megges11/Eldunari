@@ -12,5 +12,4 @@ import eldunari.origin.enumeration.DataType;
 public @interface Column {
 	public String name();
 	public DataType type() default DataType.AUTO;
-	public boolean nullable() default true;
 }

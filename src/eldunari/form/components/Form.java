@@ -2,6 +2,7 @@ package eldunari.form.components;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ComponentAdapter;
@@ -12,7 +13,7 @@ import eldunari.form.interfaces.IResizeListener;
 
 import javax.swing.JFrame;
 
-import eldunari.form.classes.VisualHelper;
+import eldunari.form.classes.helper.VisualHelper;
 import eldunari.form.enumation.ViewType;
 import eldunari.origin.interfaces.IObject;
 
@@ -28,11 +29,11 @@ public abstract class Form extends JFrame implements IResizeListener{
 	public static int DEFAULT_PADDING_BOTTOM = 5;
 	public static int DEFAULT_PADDING_RIGHT=5;
 
-	public static Point DEFAULT_COMPONENT_START_LOCATION = new Point(10,10);
+	public static Point DEFAULT_COMPONENT_START_LOCATION = new Point(10,30);
 	public static int DEFAULT_ITEM_HEIGHT = 25;
 	public static int DEFAULT_ITEM_WIDTH = 150;
 
-	public Class<?> currentClass;
+	public Class<? extends IObject> currentClass;
 	public IObject currentObject;
 	public ViewType currentViewType;
 	public ToolBar toolbar;
@@ -41,7 +42,7 @@ public abstract class Form extends JFrame implements IResizeListener{
 		return new Dimension(DEFAULT_ITEM_WIDTH,DEFAULT_ITEM_HEIGHT);
 	}
 
-	public Form(Class<?> currentClass){
+	public Form(Class<? extends IObject> currentClass){
 		this.setTitle(TITLE);
 		this.currentClass = currentClass;			
 		this.addComponentListener(new ComponentAdapter() {
@@ -52,11 +53,12 @@ public abstract class Form extends JFrame implements IResizeListener{
 	}
 
 	public abstract void init_menubar();
-	public void setContainer(Class<?> cls, ViewType type){
+	public void setContainer(Class<? extends IObject> cls, ViewType type){
 		currentClass = cls;
 		currentViewType =type;
+		currentObject = null;
 	}
-	public void setContainer(Class<?> cls, ViewType type,IObject obj){
+	public void setContainer(Class<? extends IObject> cls, ViewType type,IObject obj){
 		currentClass = cls;
 		currentViewType =type;
 		currentObject = obj;
@@ -106,6 +108,14 @@ public abstract class Form extends JFrame implements IResizeListener{
 		}
 	}
 
+	public void clear(){
+		Container container = this.getContentPane();
+		for(Component com : container.getComponents()){
+			container.remove(com);
+		}
+		this.setContentPane(container);
+	}
+	
 	//	public void init_toolbar(){}
 	//	public abstract void init_toolbar(ViewType type);
 	//	public void init_toolbar(ToolBar toolbar){

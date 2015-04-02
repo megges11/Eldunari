@@ -25,4 +25,6 @@ public interface IConnectable {
 	boolean Insert(IObject obj);
 	boolean Delete(IObject obj);
 	boolean Update(IObject obj, IObject toUpdate);
+	void setConnectionString(String constring);
+	String getConnectionString();
 }

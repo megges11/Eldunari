@@ -5,7 +5,7 @@ import java.awt.Point;
 
 import javax.swing.JRadioButton;
 
-import eldunari.form.classes.VisualHelper;
+import eldunari.form.classes.helper.VisualHelper;
 import eldunari.form.enumation.Orientation;
 import eldunari.form.interfaces.IComponent;
 
@@ -36,7 +36,7 @@ public class RadioButton extends JRadioButton implements IComponent{
 		super.setLocation(x, y);
 	}
 	@Override
-	public void setLocation(Component com, Orientation orientation) {
+	public void setLocation(IComponent com, Orientation orientation) {
 		this.setLocation(VisualHelper.GetPosition(com,orientation));
 	}
 	@Override
@@ -44,7 +44,7 @@ public class RadioButton extends JRadioButton implements IComponent{
 		return null;
 	}
 	@Override
-	public Component getNeighbor() {
+	public IComponent getNeighbor() {
 		return null;
 	}
 	@Override
@@ -108,4 +108,24 @@ public class RadioButton extends JRadioButton implements IComponent{
 	public Object getValue(){
 		return this.isSelected();
 	}
+	@Override
+	public void setEditable(boolean value) {
+		this.setEnabled(value);
+	}
+	@Override
+	public boolean isEditable() {
+		return this.isEnabled();
+	}
+	private String neighborName;
+	public void setNeighborString(String value){
+		neighborName = value;
+	}
+	public String getNeightborName(){
+		return neighborName;
+	}
+	public void setOrientation(Orientation orientation){
+//		this.orientation = orientation;
+	}
+	
+	
 }

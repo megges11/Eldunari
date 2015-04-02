@@ -14,14 +14,15 @@ import eldunari.origin.interfaces.IObject;
 
 public class SqlConnector extends Connector implements IConnectable{
 
-	private ArrayList<String> errors = new ArrayList<String>();
+	private ArrayList<String> errors = new ArrayList<String>();	
+	private String connectionString = "jdbc:mysql://localhost:3306/patient_management?user=root&password=";
 	
 	@Override
 	public Connection getConnection() {
 		Connection con = null;
 		try {
 			Class.forName("org.sqlite.JDBC");
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/patient_management?user=root&password=");
+			con = DriverManager.getConnection(connectionString);
 			if(errors.size()!=0){
 				errors.clear();
 			}
@@ -119,6 +120,14 @@ public class SqlConnector extends Connector implements IConnectable{
 	@Override
 	public boolean hasError() {
 		return (errors.size() != 0);
+	}
+
+	public String getConnectionString() {
+		return connectionString;
+	}
+
+	public void setConnectionString(String connectionString) {
+		this.connectionString = connectionString;
 	}	
 	
 }
