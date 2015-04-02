@@ -86,7 +86,6 @@ public class SQLiteHelper {
 			sql+=foreign;	
 		}
 		sql+=");";
-		System.out.println(sql);
 		return new SQLiteHelperResult(true,sql);
 	}
 
@@ -94,21 +93,24 @@ public class SQLiteHelper {
 		if(obj == null){
 			return new SQLiteHelperResult(false,"","Object can not be null");
 		}		
-
 		String sql = "INSERT INTO "+getTableName(cls)+"(";
+
 		Field[] fields = cls.getDeclaredFields();
 		String values = "";
 		String names = "";
 		for(int i = 0; i<fields.length; i++){
-			Field field = fields[i];
+			Field field = fields[i];		
 			field.setAccessible(true);
-			Column column = field.getAnnotation(Column.class);
-			if(column!= null){
-				names+=column.name();
-				values+=getFieldValue(field,null);
-				if(i < fields.length-1){
-					names+=",";
-					values+=",";
+			ColumnDefinition definition = getDefinition(cls,field);						
+			if(definition.getColumn() != null){
+				Column column = definition.getColumn();
+				if(column!= null){
+					names+=column.name();
+					values+=getFieldValue(column,field,null);
+					if(i < fields.length-1){
+						names+=",";
+						values+=",";
+					}
 				}
 			}
 		}
@@ -122,18 +124,21 @@ public class SQLiteHelper {
 		}
 		String value = "DELETE FROM "+getTableName(cls)+" WHERE ";
 		Field[] fields = cls.getDeclaredFields();
-		for(int i = 0; i<fields.length; i++){
-
+		for(int i = 0; i<fields.length; i++){		
 			Field field = fields[i];
 			field.setAccessible(true);
-			PrimaryKey primary = field.getAnnotation(PrimaryKey.class);
-			if(primary != null){
-				if(i!= 0){
-					value+=" AND ";
-				}
-				Column column = field.getAnnotation(Column.class);
-				if(column!= null){
-					value+=column.name()+"="+getFieldValue(field,null);
+
+			ColumnDefinition definition = getDefinition(cls,field);
+			if(definition.getColumn() != null){
+				PrimaryKey primary = definition.getPrimaryKey();
+				if(primary != null){
+					if(i!= 0){
+						value+=" AND ";
+					}
+					Column column = definition.getColumn();
+					if(column!= null){
+						value+=column.name()+"="+getFieldValue(column,field,null);
+					}
 				}
 			}
 		}
@@ -160,12 +165,14 @@ public class SQLiteHelper {
 			Field field = fields[i];
 			field.setAccessible(true);
 
-			PrimaryKey primary = field.getAnnotation(PrimaryKey.class);
-			Column column = field.getAnnotation(Column.class);
-			if(primary == null){
+			ColumnDefinition definition = getDefinition(cls,field);
+
+			PrimaryKey primary = definition.getPrimaryKey();
+			Column column = definition.getColumn();
+			if(primary != null){
 				if(column != null){
-					String field_obj_value = getFieldValue(field,obj);
-					String field_upd_value = getFieldValue(field,toUpdate);
+					String field_obj_value = getFieldValue(column,field,obj);
+					String field_upd_value = getFieldValue(column,field,toUpdate);
 					if(!field_obj_value.equals(field_upd_value)){
 						if(fieldcount!= 0){
 							value+=", ";
@@ -175,11 +182,13 @@ public class SQLiteHelper {
 					}
 				}
 			}else{
-				if(wherecount != 0){
-					where+=" AND ";
+				if(column != null){
+					if(wherecount != 0){
+						where+=" AND ";
+					}
+					wherecount++;
+					where += column.name()+"="+getFieldValue(column,field,toUpdate);
 				}
-				wherecount++;
-				where += column.name()+"="+getFieldValue(field,toUpdate);
 			}
 		}
 		if(fieldcount != 0){
@@ -366,11 +375,11 @@ public class SQLiteHelper {
 			return cls.getSimpleName();
 		}
 	}
-	private String getFieldValue(Field field,IObject tempObj) {
+	private String getFieldValue(Column column, Field field,IObject tempObj) {
 		try {
 			IObject obj = (tempObj == null) ? this.obj : tempObj;
 			String value = "";
-			Column column = field.getAnnotation(Column.class);
+			//			Column column = field.getAnnotation(Column.class);
 			Class<?>[] bestfits = column.type().getBestFitClasses();
 			Class<?> type = null;
 			for(Class<?> available : bestfits){
@@ -439,7 +448,7 @@ public class SQLiteHelper {
 		return "No type found change database type or Attribute type to match field and column";
 	}
 
-	private ColumnDefinition getDefinition(Class<? extends IObject> cls, Field field){
+	public static ColumnDefinition getDefinition(Class<? extends IObject> cls, Field field){
 		ColumnDefinition definition = new ColumnDefinition();
 		field.setAccessible(true);
 

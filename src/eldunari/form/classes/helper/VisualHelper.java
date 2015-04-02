@@ -17,6 +17,8 @@ import eldunari.general.classes.ClassFinder;
 import eldunari.general.classes.OutputHandler;
 import eldunari.general.enumeration.OutputType;
 import eldunari.origin.annotation.Column;
+import eldunari.origin.classes.helper.ColumnDefinition;
+import eldunari.origin.classes.helper.SQLiteHelper;
 import eldunari.origin.interfaces.IObject;
 import eldunari.form.annotation.DataModel;
 import eldunari.form.components.Form;
@@ -99,7 +101,10 @@ public class VisualHelper {
 				Field[] fields = cls.getDeclaredFields();
 				for(Field field : fields){
 					field.setAccessible(true);
-					Column col = field.getAnnotation(Column.class);
+					
+					ColumnDefinition definition = SQLiteHelper.getDefinition(obj.getClass(), field);
+					
+					Column col = definition.getColumn();
 					if(col != null){
 						String col_name = col.name();
 

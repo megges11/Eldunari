@@ -5,6 +5,7 @@ import eldunari.general.classes.OutputHandler;
 import eldunari.general.enumeration.OutputType;
 import eldunari.origin.annotation.Column;
 import eldunari.origin.annotation.Relation;
+import eldunari.origin.classes.helper.ColumnDefinition;
 import eldunari.origin.classes.helper.OrderByDefinition;
 import eldunari.origin.classes.helper.QueryResult;
 import eldunari.origin.classes.helper.SQLiteHelper;
@@ -60,6 +61,7 @@ public class Connector{
 
 		SQLiteHelper helper = new SQLiteHelper(obj);
 		SQLiteHelperResult result = helper.getInsertQuery();
+		System.out.println(result.getValue());
 		if(result.isSuccess()){	
 			if (connector.executeUpdate(result.getValue()) != 0){
 				if(trigger != null)
@@ -118,11 +120,13 @@ public class Connector{
 			Field[] fields = cls.getDeclaredFields();
 			for(int i=0;i<fields.length;i++){
 				fields[i].setAccessible(true);
-				Column column = fields[i].getAnnotation(Column.class);
+				
+				ColumnDefinition definition = SQLiteHelper.getDefinition(cls, fields[i]);
+				
+				Column column = definition.getColumn();
 				if(column != null){
-
 					if(ResultSetContains(result,column.name())){
-						fields[i] = setFieldValue(fields[i],result.getString(column.name()),obj);
+						fields[i] = setFieldValue(column,fields[i],result.getString(column.name()),obj);
 					}
 				}
 			}
@@ -142,9 +146,8 @@ public class Connector{
 
 	}
 
-	public Field setFieldValue(Field field,String value,IObject obj) {
+	public Field setFieldValue(Column column,Field field,String value,IObject obj) {
 		try {
-			Column column = field.getAnnotation(Column.class);
 			Class<?>[] bestfits = column.type().getBestFitClasses();
 			Class<?> type = null;
 			for(Class<?> available : bestfits){

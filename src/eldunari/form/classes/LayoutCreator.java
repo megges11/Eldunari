@@ -27,16 +27,15 @@ public class LayoutCreator {
 		return currentClass;
 	}
 
-	public Container getContainer(){
-		if(components != null){
-			Container container = new Container();			
+	public Container getContainer(Container container){
+		if(components != null){	
 			for(IComponent component : components){
 				String neighbor = component.getNeightborName();
 				component.setLocation(null,component.getOrientation());
 				if(neighbor != null){
 					IComponent n = getComponentByName(neighbor);
 					component.setLocation(n, component.getOrientation());
-				}				
+				}
 				container.add((Component)component);
 			}			
 			return container;
@@ -62,6 +61,8 @@ public class LayoutCreator {
 					lbl.setSize(fl.width(),fl.height());
 					lbl.setMin(fl.width(), fl.height());
 					lbl.setMax(fl.width(), fl.height());
+					lbl.setNeighborString(fl.neighborName());
+					lbl.setLocation(getComponentByName(fl.neighborName()), fl.orientation());
 					components.add(lbl);
 				}
 
@@ -76,6 +77,7 @@ public class LayoutCreator {
 					com.setOrientation(ifield.orientation());
 					com.setMin(ifield.width(), ifield.height());
 					com.setMax(ifield.width(), ifield.height());
+					com.setLocation(getComponentByName(ifield.neighborName()), ifield.orientation());
 					components.add(com);
 				}
 			}
