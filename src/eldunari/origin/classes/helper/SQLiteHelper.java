@@ -16,10 +16,12 @@ import eldunari.origin.annotation.PrimaryKey;
 import eldunari.origin.annotation.Relation;
 import eldunari.origin.annotation.Required;
 import eldunari.origin.annotation.Table;
+import eldunari.origin.classes.Connector;
 import eldunari.origin.enumeration.ConstraintAction;
 import eldunari.origin.enumeration.ConstraintRule;
 import eldunari.origin.enumeration.DataType;
 import eldunari.origin.interfaces.IObject;
+import eldunari.origin.interfaces.IView;
 
 public class SQLiteHelper {
 
@@ -198,6 +200,30 @@ public class SQLiteHelper {
 		}
 		return new SQLiteHelperResult(true,value);
 	}	
+
+	public SQLiteHelperResult getSelectViewQuery(WhereDefinition[] where){
+		try{
+			if(Connector.implementsInterface(cls,IView.class)){			
+				String sql="";
+				if(where!=null && where.length!= 0){
+					sql+=" WHERE ";
+					for(int i = 0; i<where.length;i++){
+						WhereDefinition wheredef = where[i];
+						sql+= wheredef.getClause();
+						if(i<where.length-1){
+							sql+= " AND ";
+						}
+					}
+				}
+				IView view = (IView)cls.newInstance();
+				sql = view.getSelection(sql);
+				return new SQLiteHelperResult(true,sql,"");
+			}		
+			return new SQLiteHelperResult(false,"","Class<?> is not from Type IView");
+		}catch(Exception ex){
+			return new SQLiteHelperResult(false,"",ex.getMessage());
+		}
+	}
 
 	public SQLiteHelperResult getSelectQuery(String[] fieldnames,WhereDefinition[] where,OrderByDefinition[] orderby,String groupby,int limit){
 		if(cls == null){

@@ -16,6 +16,7 @@ import eldunari.origin.interfaces.IConnectable;
 import eldunari.origin.interfaces.IObject;
 import eldunari.origin.interfaces.ITrigger;
 import eldunari.origin.interfaces.IValidator;
+import eldunari.origin.interfaces.IView;
 
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
@@ -25,7 +26,7 @@ import java.util.Date;
 
 
 public class Connector{
-	
+
 	public String VALIDATOR_PACKAGE = "mpad.contracts.validator";
 	public String TRIGGER_PACKAGE = "mpad.contracts.trigger";
 
@@ -89,9 +90,23 @@ public class Connector{
 		return false;
 	}
 
+	public static boolean implementsInterface(Class<?> cls, Class<?> implementedClass){
+		for(Class<?> iface : cls.getInterfaces()){
+			if(iface.equals(implementedClass)){
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public <T extends IObject> ArrayList<T> Select(IConnectable connector, Class<T> cls, String[] fieldnames, WhereDefinition[] where, OrderByDefinition[] orderby,String groupby,int limit){
-		SQLiteHelper helper = new SQLiteHelper(cls);
-		SQLiteHelperResult result = helper.getSelectQuery(fieldnames, where, orderby,groupby,limit);
+		SQLiteHelper helper = new SQLiteHelper(cls);		
+		SQLiteHelperResult result = null;
+		if(implementsInterface(cls,IView.class)){
+			result = helper.getSelectViewQuery(where);
+		}else{
+			result = helper.getSelectQuery(fieldnames, where, orderby,groupby,limit);
+		}
 		if(result.isSuccess()){
 			QueryResult queryresult = connector.executeQuery(result.getValue());
 			if(queryresult == null || queryresult.getResult() == null){
@@ -120,9 +135,9 @@ public class Connector{
 			Field[] fields = cls.getDeclaredFields();
 			for(int i=0;i<fields.length;i++){
 				fields[i].setAccessible(true);
-				
+
 				ColumnDefinition definition = SQLiteHelper.getDefinition(cls, fields[i]);
-				
+
 				Column column = definition.getColumn();
 				if(column != null){
 					if(ResultSetContains(result,column.name())){
