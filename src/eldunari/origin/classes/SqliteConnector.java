@@ -27,6 +27,7 @@ public class SqliteConnector extends Connector implements IConnectable{
 				errors.clear();
 			}
 		} catch ( Exception e ) {
+			errors.add(e.getMessage());
 		}
 		return con;
 	}
@@ -38,6 +39,7 @@ public class SqliteConnector extends Connector implements IConnectable{
 			ResultSet result = stmt.executeQuery(sql);
 			return new QueryResult(con,stmt,result);			
 		}catch(Exception ex){
+			errors.add(ex.getMessage());
 			return null;
 		}
 	}
@@ -50,7 +52,7 @@ public class SqliteConnector extends Connector implements IConnectable{
 			con.close();
 			return result;	
 		}catch(Exception ex){
-			ex.printStackTrace();
+			errors.add(ex.getMessage());
 			return 0;
 		}
 	}
@@ -78,8 +80,16 @@ public class SqliteConnector extends Connector implements IConnectable{
 
 	@Override
 	public String getError() {
-		return null;
+		String error = "";
+		for(String err : errors){
+			error+=err+"\n";
+		}
+		return error;
 	}	
+	public void addError(String value){
+		errors.add(value);
+	}
+
 	
 	@Override
 	public <T extends IObject> ArrayList<T> Select(Class<T> cls) {
@@ -124,6 +134,24 @@ public class SqliteConnector extends Connector implements IConnectable{
 	public void setConnectionString(String connectionString) {
 		this.connectionString = connectionString;
 	}	
-	
+	@Override
+	public void setValidatorPackage(String value) {
+		this.VALIDATOR_PACKAGE = value;
+	}
+
+	@Override
+	public void setTriggerPackage(String value) {
+		this.TRIGGER_PACKAGE = value;
+	}
+
+	@Override
+	public String getValidatorPackage() {
+		return VALIDATOR_PACKAGE;
+	}
+
+	@Override
+	public String getTriggerPackage() {
+		return TRIGGER_PACKAGE;
+	}
 	
 }

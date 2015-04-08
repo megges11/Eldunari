@@ -173,6 +173,15 @@ public class SQLiteHelper {
 			Column column = definition.getColumn();
 			if(primary != null){
 				if(column != null){
+					if(wherecount != 0){
+						where+=" AND ";
+					}
+					wherecount++;
+					where += column.name()+"="+getFieldValue(column,field,toUpdate);
+				}
+				
+			}else{
+				if(column != null){
 					String field_obj_value = getFieldValue(column,field,obj);
 					String field_upd_value = getFieldValue(column,field,toUpdate);
 					if(!field_obj_value.equals(field_upd_value)){
@@ -182,14 +191,6 @@ public class SQLiteHelper {
 						fieldcount++;
 						value+=column.name()+"="+field_obj_value;
 					}
-				}
-			}else{
-				if(column != null){
-					if(wherecount != 0){
-						where+=" AND ";
-					}
-					wherecount++;
-					where += column.name()+"="+getFieldValue(column,field,toUpdate);
 				}
 			}
 		}

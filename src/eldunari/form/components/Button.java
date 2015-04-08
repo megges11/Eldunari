@@ -19,6 +19,10 @@ public class Button extends JButton implements IComponent{
 	private int percentWidth;
 	private int percentHeight;
 	
+	private boolean lockx;
+	private boolean locky;
+	private String neighborName;
+	
 	private int maxWidth;
 	private int minWidth;
 	private int maxHeight;
@@ -46,6 +50,14 @@ public class Button extends JButton implements IComponent{
 				callingMethod.Call();
 			}
 		});
+	}
+	
+	public void setSize(int width,int height){
+		minHeight = height;
+		maxHeight = height;
+		minWidth = width;
+		maxWidth = width;
+		super.setSize(width, height);
 	}
 	
 	public void setTag(String value){
@@ -115,10 +127,7 @@ public class Button extends JButton implements IComponent{
 	public void setMin(int width, int height) {
 		this.minHeight = height;
 		this.minWidth = width;	
-	}
-	
-	private boolean lockx;
-	private boolean locky;	
+	}	
 	
 	public void setLockedX(boolean value){
 		this.lockx = value;
@@ -145,7 +154,7 @@ public class Button extends JButton implements IComponent{
 		return this.isEnabled();
 	}
 
-	private String neighborName;
+
 	public void setNeighborString(String value){
 		neighborName = value;
 	}

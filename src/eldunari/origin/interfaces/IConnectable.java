@@ -11,10 +11,16 @@ public interface IConnectable {
 
 	String getError();
 	boolean hasError();
+	void addError(String value);
 	
 	Connection getConnection();
 	QueryResult executeQuery(String sql);
 	int executeUpdate(String sql);
+	
+	void setValidatorPackage(String value);
+	void setTriggerPackage(String value);
+	String getValidatorPackage();
+	String getTriggerPackage();
 	
 	<T extends IObject> ArrayList<T> Select(Class<T> cls);	
 	<T extends IObject> ArrayList<T> Select(Class<T> cls, String[] fieldnames);	

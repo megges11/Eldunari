@@ -27,6 +27,7 @@ public class SqlConnector extends Connector implements IConnectable{
 				errors.clear();
 			}
 		} catch ( Exception e ) {
+			this.errors.add(e.getMessage());
 		}
 		return con;
 	}
@@ -79,11 +80,14 @@ public class SqlConnector extends Connector implements IConnectable{
 
 	@Override
 	public String getError() {
-		String error="";
-		for(String item:errors){
-			error+=item+"\n";
+		String error = "";
+		for(String err : errors){
+			error+=err+"\n";
 		}
 		return error;
+	}	
+	public void addError(String value){
+		errors.add(value);
 	}
 
 	@Override
@@ -128,6 +132,26 @@ public class SqlConnector extends Connector implements IConnectable{
 
 	public void setConnectionString(String connectionString) {
 		this.connectionString = connectionString;
+	}
+
+	@Override
+	public void setValidatorPackage(String value) {
+		this.VALIDATOR_PACKAGE = value;
+	}
+
+	@Override
+	public void setTriggerPackage(String value) {
+		this.TRIGGER_PACKAGE = value;
+	}
+
+	@Override
+	public String getValidatorPackage() {
+		return VALIDATOR_PACKAGE;
+	}
+
+	@Override
+	public String getTriggerPackage() {
+		return TRIGGER_PACKAGE;
 	}	
 	
 }

@@ -7,6 +7,10 @@ public class EldunariList<T> extends ArrayList<T> {
 	public EldunariList(){
 	}
 
+	public boolean any(){
+		return this.size() != 0;
+	}
+	
 	public T firstOrDefault(){
 		if(this.size()!= 0){
 			return this.get(0);

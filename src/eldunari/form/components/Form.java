@@ -103,7 +103,7 @@ public abstract class Form extends JFrame implements IResizeListener{
 						Point location = VisualHelper.GetPosition(com.getNeighbor(), com.getOrientation());
 						component.setLocation(location.x,component.getLocation().y);
 					}
-				}
+				}				
 			}
 		}
 	}

@@ -27,8 +27,8 @@ import java.util.Date;
 
 public class Connector{
 
-	public String VALIDATOR_PACKAGE = "mpad.contracts.validator";
-	public String TRIGGER_PACKAGE = "mpad.contracts.trigger";
+	public String VALIDATOR_PACKAGE = "";
+	public String TRIGGER_PACKAGE = "";
 
 	public boolean Initialize(IConnectable connector,Class<? extends IObject> cls) throws Exception{	
 		SQLiteHelper helper = new SQLiteHelper(cls);
@@ -54,22 +54,23 @@ public class Connector{
 				String error = "";
 				for(String err:validator.Error()){
 					error += err+"\n";
-				}
-				OutputHandler.Message(OutputType.Error,error);
+				}			
+				connector.addError(error);
 				return false;
 			}
 		}
 
 		SQLiteHelper helper = new SQLiteHelper(obj);
 		SQLiteHelperResult result = helper.getInsertQuery();
-		System.out.println(result.getValue());
 		if(result.isSuccess()){	
 			if (connector.executeUpdate(result.getValue()) != 0){
 				if(trigger != null)
 					obj = trigger.PostItem(obj);
 				return true;
 			}
-		}return false;
+		}
+		connector.addError(result.getMessage());
+		return false;
 	}
 
 	public boolean Delete(IConnectable connector,IObject obj){
@@ -78,6 +79,7 @@ public class Connector{
 		if(result.isSuccess()){
 			return connector.executeUpdate(result.getValue())!=0;
 		}
+		connector.addError(result.getMessage());
 		return false;		
 	}
 
@@ -87,6 +89,7 @@ public class Connector{
 		if(result.isSuccess() && !result.getValue().isEmpty()){
 			return connector.executeUpdate(result.getValue())!=0;
 		}
+		connector.addError(result.getMessage());
 		return false;
 	}
 
@@ -123,9 +126,10 @@ public class Connector{
 				queryresult.getConnection().close();
 				return items;
 			} catch (Exception ex) {
-				ex.printStackTrace();
+				connector.addError(ex.getMessage());
 			}
 		}
+		connector.addError(result.getMessage());
 		return null;
 	}
 

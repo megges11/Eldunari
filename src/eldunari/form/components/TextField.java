@@ -29,11 +29,7 @@ public class TextField extends JTextField implements IComponent{
 	public Point getLocationXY(){
 		return super.getLocation();
 	}	
-	
-	public void setLocation(int x, int y){
-		super.setLocation(x, y);
-	}
-	
+		
 	public void setLocation(IComponent com, Orientation orientation){
 		this.orientation = orientation;
 		this.neighborComponent = com;

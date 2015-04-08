@@ -8,7 +8,9 @@ public class WhereDefinition {
 	private String value;
 	private Operator operator;
 	
-	public WhereDefinition(){}
+	public WhereDefinition(){
+		this.operator = Operator.Equal;
+	}
 	public WhereDefinition(String field, String value){
 		this.field = field;
 		this.value = value;
