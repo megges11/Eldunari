@@ -9,10 +9,15 @@ import java.util.ArrayList;
 import eldunari.form.annotation.Dimension;
 import eldunari.form.annotation.InputField;
 import eldunari.form.annotation.FormLabel;
+import eldunari.form.components.ExternalLookup;
 import eldunari.form.components.Label;
 import eldunari.form.interfaces.IComponent;
 import eldunari.general.classes.OutputHandler;
 import eldunari.general.enumeration.OutputType;
+import eldunari.origin.annotation.Relation;
+import eldunari.origin.classes.helper.ColumnDefinition;
+import eldunari.origin.classes.helper.SQLiteHelper;
+import eldunari.origin.interfaces.IObject;
 
 public class LayoutCreator {
 
@@ -78,6 +83,18 @@ public class LayoutCreator {
 					com.setMin(ifield.width(), ifield.height());
 					com.setMax(ifield.width(), ifield.height());
 					com.setLocation(getComponentByName(ifield.neighborName()), ifield.orientation());
+
+					if(ifield.cls().equals(ExternalLookup.class)){
+						@SuppressWarnings("unchecked")
+						ColumnDefinition column = SQLiteHelper.getDefinition((Class<? extends IObject>)currentClass, field);
+						ArrayList<Relation> relations = column.getRelations();
+						if(relations != null && relations.size() > 0){
+							ExternalLookup lookup = (ExternalLookup) com;
+							lookup.setLookupClass(relations.get(0).table());
+							components.add(lookup.getButton());
+						}
+					}
+
 					components.add(com);
 				}
 			}
@@ -104,11 +121,20 @@ public class LayoutCreator {
 	}
 
 	private IComponent getComponentByName(String name){
-		for(IComponent com : components){
-			if(com.getName().equals(name)){
-				return com;
+		try{
+			for(IComponent com : components){
+				if(com != null){
+					String comname = com.getName();
+					if(comname != null && comname.equals(name)){
+						return com;
+					}
+				}
 			}
-		}return null;
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
+		return null;
+
 	}
-	
+
 }

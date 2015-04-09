@@ -21,7 +21,7 @@ public abstract class Form extends JFrame implements IResizeListener{
 	private static final long serialVersionUID = 8173638485155786959L;
 
 	public static final Dimension DEFAULT_SIZE = new Dimension(700,500);
-	public static String TITLE = "Eldunari Form";
+	public String TITLE = "Eldunari Form";
 	public static Color DEFAULT_BACKGROUND = Color.LIGHT_GRAY;
 	public static int TOOLBAR_HEIGHT = 25;
 	public static int DEFAULT_PADDING_LEFT = 5;
