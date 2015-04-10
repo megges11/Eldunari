@@ -1,17 +1,17 @@
 package eldunari.origin.classes.helper;
 
-public class SQLiteHelperResult {
+public class QueryHelperResult {
 
 	private String value;
 	private boolean success;
 	private String message;
 
-	public SQLiteHelperResult(boolean success, String value, String message){
+	public QueryHelperResult(boolean success, String value, String message){
 		this.success = success;
 		this.value = value;
 		this.message = message;
 	}
-	public SQLiteHelperResult(boolean success, String value){
+	public QueryHelperResult(boolean success, String value){
 		this.success = success;
 		this.value = value;
 		this.message = (success) ? "Success" : "Failed" ;

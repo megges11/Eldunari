@@ -11,7 +11,7 @@ import eldunari.form.enumation.Orientation;
 @Target(ElementType.FIELD)
 public @interface FormLabel{
 	String name();
-	String text();
+	String text() default "";
 	String neighborName() default "";
 	Orientation orientation() default Orientation.Bottom;
 	String tag() default "";

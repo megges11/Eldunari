@@ -1,5 +1,7 @@
 package eldunari.form.classes.helper;
 
+import eldunari.form.annotation.Caption;
+import eldunari.general.annotation.Definition;
 import eldunari.general.classes.OutputHandler;
 import eldunari.general.enumeration.OutputType;
 
@@ -13,6 +15,19 @@ public class GridHelper {
 	private String[] fieldNames;
 
 	private ArrayList<?> mItems;
+
+	public GridHelper(Class<?> cls, ArrayList<?> mItems,String[] fieldNames){
+		this.currentClass = cls;
+		this.mItems = mItems;		
+		this.fieldNames = fieldNames;
+		setCaptions();
+	}
+
+	public GridHelper(Class<?> cls, String[] fieldNames){
+		currentClass = cls;		
+		this.fieldNames = fieldNames;
+		setCaptions();
+	}
 
 	public GridHelper(Class<?> cls, ArrayList<?> mItems,String[] columns,String[] fieldNames){
 		this.currentClass = cls;
@@ -59,5 +74,33 @@ public class GridHelper {
 			OutputHandler.Message(OutputType.Error, ex.getMessage());
 		}
 		return null;
+	}
+
+	private void setCaptions(){
+		columns = new String[fieldNames.length];
+		for(int i = 0 ; i < fieldNames.length ; i++){		
+			for(Field field : currentClass.getDeclaredFields()){
+				if(field.getName().equals(fieldNames[i])){
+					Caption cap = field.getAnnotation(Caption.class);
+					if(cap != null){
+						columns[i] = cap.value();
+					}else{
+						Definition definition = currentClass.getAnnotation(Definition.class);
+						for(Class<?> cls : definition.value()){
+							for(Field f : cls.getDeclaredFields()){
+								if(f.getName().equals(field.getName()) && columns[i] == null){
+									Caption caption = f.getAnnotation(Caption.class);
+									if(caption != null){
+										columns[i] = caption.value();
+									}else{
+										columns[i] = field.getName();
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 }

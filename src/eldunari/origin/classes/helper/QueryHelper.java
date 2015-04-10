@@ -23,15 +23,15 @@ import eldunari.origin.enumeration.DataType;
 import eldunari.origin.interfaces.IObject;
 import eldunari.origin.interfaces.IView;
 
-public class SQLiteHelper {
+public class QueryHelper {
 
 	private Class<? extends IObject> cls;
 	private IObject obj;
 
-	public SQLiteHelper(Class<? extends IObject> cls){
+	public QueryHelper(Class<? extends IObject> cls){
 		this.cls = cls;
 	}
-	public SQLiteHelper(IObject obj){
+	public QueryHelper(IObject obj){
 		this.obj = obj;
 		this.cls = obj.getClass();
 	}
@@ -43,9 +43,9 @@ public class SQLiteHelper {
 		return obj;
 	}
 
-	public SQLiteHelperResult getTableQuery(){
+	public QueryHelperResult getTableQuery(){
 		if(cls == null){
-			return new SQLiteHelperResult(false,"","Class<? extends IObject> can not be null");
+			return new QueryHelperResult(false,"","Class<? extends IObject> can not be null");
 		}
 		String sql = "CREATE TABLE IF NOT EXISTS "+getTableName(cls)+"(";
 		Field[] fields = cls.getDeclaredFields();
@@ -58,7 +58,7 @@ public class SQLiteHelper {
 			field.setAccessible(true);
 			ColumnDefinition definition = getDefinition(cls,field);
 			if(definition.hasErrors()){
-				return new SQLiteHelperResult(false,"",definition.getError());
+				return new QueryHelperResult(false,"",definition.getError());
 			}
 			if(definition.getColumn()!= null){
 				String fieldsql = definition.getColumn().name();
@@ -88,12 +88,12 @@ public class SQLiteHelper {
 			sql+=foreign;	
 		}
 		sql+=");";
-		return new SQLiteHelperResult(true,sql);
+		return new QueryHelperResult(true,sql);
 	}
 
-	public SQLiteHelperResult getInsertQuery(){
+	public QueryHelperResult getInsertQuery(){
 		if(obj == null){
-			return new SQLiteHelperResult(false,"","Object can not be null");
+			return new QueryHelperResult(false,"","Object can not be null");
 		}		
 		String sql = "INSERT INTO "+getTableName(cls)+"(";
 
@@ -117,12 +117,12 @@ public class SQLiteHelper {
 			}
 		}
 		sql += names+")VALUES("+values+");";
-		return new SQLiteHelperResult(true,sql);
+		return new QueryHelperResult(true,sql);
 	}
 
-	public SQLiteHelperResult getDeleteQuery(){
+	public QueryHelperResult getDeleteQuery(){
 		if(obj == null){
-			return new SQLiteHelperResult(false,"","Object can not be null");
+			return new QueryHelperResult(false,"","Object can not be null");
 		}
 		String value = "DELETE FROM "+getTableName(cls)+" WHERE ";
 		Field[] fields = cls.getDeclaredFields();
@@ -144,18 +144,18 @@ public class SQLiteHelper {
 				}
 			}
 		}
-		return new SQLiteHelperResult(true,value);
+		return new QueryHelperResult(true,value);
 	}
 
-	public SQLiteHelperResult getUpdateQuery(IObject toUpdate){
+	public QueryHelperResult getUpdateQuery(IObject toUpdate){
 		if(obj == null){
-			return new SQLiteHelperResult(false,"","Object can not be null");
+			return new QueryHelperResult(false,"","Object can not be null");
 		}
 		if(toUpdate == null){
-			return new SQLiteHelperResult(false,"","To Updated Object can not be null");
+			return new QueryHelperResult(false,"","To Updated Object can not be null");
 		}		
 		if(obj.getClass() != toUpdate.getClass()){
-			return new SQLiteHelperResult(false,"","Object class and toUpdated Object class are not the same");
+			return new QueryHelperResult(false,"","Object class and toUpdated Object class are not the same");
 		}
 
 		String value = "UPDATE "+getTableName(cls)+" SET ";
@@ -199,10 +199,10 @@ public class SQLiteHelper {
 		}else{
 			value="";
 		}
-		return new SQLiteHelperResult(true,value);
+		return new QueryHelperResult(true,value);
 	}	
 
-	public SQLiteHelperResult getSelectViewQuery(WhereDefinition[] where){
+	public QueryHelperResult getSelectViewQuery(WhereDefinition[] where){
 		try{
 			if(Connector.implementsInterface(cls,IView.class)){			
 				String sql="";
@@ -218,17 +218,17 @@ public class SQLiteHelper {
 				}
 				IView view = (IView)cls.newInstance();
 				sql = view.getSelection(sql);
-				return new SQLiteHelperResult(true,sql,"");
+				return new QueryHelperResult(true,sql,"");
 			}		
-			return new SQLiteHelperResult(false,"","Class<?> is not from Type IView");
+			return new QueryHelperResult(false,"","Class<?> is not from Type IView");
 		}catch(Exception ex){
-			return new SQLiteHelperResult(false,"",ex.getMessage());
+			return new QueryHelperResult(false,"",ex.getMessage());
 		}
 	}
 
-	public SQLiteHelperResult getSelectQuery(String[] fieldnames,WhereDefinition[] where,OrderByDefinition[] orderby,String groupby,int limit){
+	public QueryHelperResult getSelectQuery(String[] fieldnames,WhereDefinition[] where,OrderByDefinition[] orderby,String groupby,int limit){
 		if(cls == null){
-			return new SQLiteHelperResult(false,"","Class<? extends Object> can not be null");
+			return new QueryHelperResult(false,"","Class<? extends Object> can not be null");
 		}
 		String sql = "SELECT ";
 		if(fieldnames!=null && fieldnames.length!= 0){
@@ -270,7 +270,7 @@ public class SQLiteHelper {
 			sql+= " LIMIT "+limit;
 		}
 
-		return new SQLiteHelperResult(true,sql);
+		return new QueryHelperResult(true,sql);
 	}
 
 

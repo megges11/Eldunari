@@ -6,18 +6,15 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 
+import eldunari.form.annotation.Caption;
 import eldunari.form.annotation.Dimension;
 import eldunari.form.annotation.InputField;
 import eldunari.form.annotation.FormLabel;
-import eldunari.form.components.ExternalLookup;
 import eldunari.form.components.Label;
 import eldunari.form.interfaces.IComponent;
+import eldunari.general.annotation.Definition;
 import eldunari.general.classes.OutputHandler;
 import eldunari.general.enumeration.OutputType;
-import eldunari.origin.annotation.Relation;
-import eldunari.origin.classes.helper.ColumnDefinition;
-import eldunari.origin.classes.helper.SQLiteHelper;
-import eldunari.origin.interfaces.IObject;
 
 public class LayoutCreator {
 
@@ -61,7 +58,11 @@ public class LayoutCreator {
 					FormLabel fl = definition.getLabel();
 					Label lbl = new Label();
 					lbl.setName(fl.name());
-					lbl.setText(fl.text());
+					if(definition.getCaption()!= null){
+						lbl.setText(definition.getCaption().value());
+					}else{
+						lbl.setText(fl.text());
+					}
 					lbl.setTag(fl.tag());
 					lbl.setSize(fl.width(),fl.height());
 					lbl.setMin(fl.width(), fl.height());
@@ -83,18 +84,6 @@ public class LayoutCreator {
 					com.setMin(ifield.width(), ifield.height());
 					com.setMax(ifield.width(), ifield.height());
 					com.setLocation(getComponentByName(ifield.neighborName()), ifield.orientation());
-
-					if(ifield.cls().equals(ExternalLookup.class)){
-						@SuppressWarnings("unchecked")
-						ColumnDefinition column = SQLiteHelper.getDefinition((Class<? extends IObject>)currentClass, field);
-						ArrayList<Relation> relations = column.getRelations();
-						if(relations != null && relations.size() > 0){
-							ExternalLookup lookup = (ExternalLookup) com;
-							lookup.setLookupClass(relations.get(0).table());
-							components.add(lookup.getButton());
-						}
-					}
-
 					components.add(com);
 				}
 			}
@@ -104,20 +93,42 @@ public class LayoutCreator {
 	}
 
 	private LayoutDefinition getDefinition(Class<?> cls, Field field){
-		LayoutDefinition definition = new LayoutDefinition();
+		LayoutDefinition layoutdef = new LayoutDefinition();
 		field.setAccessible(true);
 
+		Definition definition = cls.getAnnotation(Definition.class);
+		for(Class<?> defclass : definition.value()){
+			for(Field f : defclass.getDeclaredFields()){
+				if(f.getName().equals(field.getName())){
+					Annotation[] annotations = f.getAnnotations();
+					for(Annotation anno : annotations){
+						if(anno.annotationType().equals(FormLabel.class)){
+							layoutdef.setLabel((FormLabel)anno);
+						}else if(anno.annotationType().equals(InputField.class)){
+							layoutdef.setInputField((InputField)anno);
+						}else if(anno.annotationType().equals(Dimension.class)){
+							layoutdef.setDimension((Dimension)anno);
+						}else if(anno.annotationType().equals(Caption.class)){
+							layoutdef.setCaption((Caption)anno);
+						}
+					}
+				}
+			}
+		}
+		
 		Annotation[] annotations = field.getAnnotations();
 		for(Annotation anno : annotations){
 			if(anno.annotationType().equals(FormLabel.class)){
-				definition.setLabel((FormLabel)anno);
+				layoutdef.setLabel((FormLabel)anno);
 			}else if(anno.annotationType().equals(InputField.class)){
-				definition.setInputField((InputField)anno);
+				layoutdef.setInputField((InputField)anno);
 			}else if(anno.annotationType().equals(Dimension.class)){
-				definition.setDimension((Dimension)anno);
+				layoutdef.setDimension((Dimension)anno);
+			}else if(anno.annotationType().equals(Caption.class)){
+				layoutdef.setCaption((Caption)anno);
 			}
 		}
-		return definition;
+		return layoutdef;
 	}
 
 	private IComponent getComponentByName(String name){

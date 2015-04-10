@@ -10,7 +10,7 @@ import eldunari.origin.interfaces.IObject;
 public class RequiredTables {
 
 	private ArrayList<Class<? extends IObject>> required;
-	
+
 	public void AddRequired(Class<? extends IObject> cls){
 		if(required == null){
 			required = new ArrayList<Class<? extends IObject>>();
@@ -26,24 +26,28 @@ public class RequiredTables {
 	public boolean RemoveRequired(Class<? extends IObject> cls){
 		return required.remove(cls);
 	}
-	
-	public void Initialize(boolean sqlite,String constring) throws Exception{
-		if(required == null){
-			required = new ArrayList<Class<? extends IObject>>();
-		}
-		IConnectable con = null;
-		Connector connect = new Connector();
-		if(sqlite){
-			con = new SqliteConnector();			
-		}else{
-			con = new SqlConnector();
-		}
-		con.setConnectionString(constring);
-		for(Class<? extends IObject> cls : required){
-			connect.Initialize(con,cls);
-			if(con.hasError()){
-				System.err.println(con.getError());
+
+	public void Initialize(boolean sqlite,String constring){
+		try{
+			if(required == null){
+				required = new ArrayList<Class<? extends IObject>>();
 			}
+			IConnectable con = null;
+			Connector connect = new Connector();
+			if(sqlite){
+				con = new SqliteConnector();			
+			}else{
+				con = new SqlConnector();
+			}
+			con.setConnectionString(constring);
+			for(Class<? extends IObject> cls : required){
+				connect.Initialize(con,cls);
+				if(con.hasError()){
+					System.err.println(con.getError());
+				}
+			}
+		}catch(Exception ex){
+			ex.printStackTrace();
 		}
 	}	
 }

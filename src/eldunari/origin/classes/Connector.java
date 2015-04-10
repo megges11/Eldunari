@@ -4,12 +4,12 @@ import eldunari.general.classes.ClassFinder;
 import eldunari.general.classes.OutputHandler;
 import eldunari.general.enumeration.OutputType;
 import eldunari.origin.annotation.Column;
-import eldunari.origin.annotation.Relation;
+//import eldunari.origin.annotation.Relation;
 import eldunari.origin.classes.helper.ColumnDefinition;
 import eldunari.origin.classes.helper.OrderByDefinition;
 import eldunari.origin.classes.helper.QueryResult;
-import eldunari.origin.classes.helper.SQLiteHelper;
-import eldunari.origin.classes.helper.SQLiteHelperResult;
+import eldunari.origin.classes.helper.QueryHelper;
+import eldunari.origin.classes.helper.QueryHelperResult;
 import eldunari.origin.classes.helper.WhereDefinition;
 import eldunari.origin.enumeration.DataType;
 import eldunari.origin.interfaces.IConnectable;
@@ -31,8 +31,8 @@ public class Connector{
 	public String TRIGGER_PACKAGE = "";
 
 	public boolean Initialize(IConnectable connector,Class<? extends IObject> cls) throws Exception{	
-		SQLiteHelper helper = new SQLiteHelper(cls);
-		SQLiteHelperResult result = helper.getTableQuery();
+		QueryHelper helper = new QueryHelper(cls);
+		QueryHelperResult result = helper.getTableQuery();
 		if(result.isSuccess()){	
 			connector.executeUpdate(result.getValue());
 		}else{
@@ -60,8 +60,8 @@ public class Connector{
 			}
 		}
 
-		SQLiteHelper helper = new SQLiteHelper(obj);
-		SQLiteHelperResult result = helper.getInsertQuery();
+		QueryHelper helper = new QueryHelper(obj);
+		QueryHelperResult result = helper.getInsertQuery();
 		if(result.isSuccess()){	
 			if (connector.executeUpdate(result.getValue()) != 0){
 				if(trigger != null)
@@ -74,8 +74,8 @@ public class Connector{
 	}
 
 	public boolean Delete(IConnectable connector,IObject obj){
-		SQLiteHelper helper = new SQLiteHelper(obj);
-		SQLiteHelperResult result = helper.getDeleteQuery();
+		QueryHelper helper = new QueryHelper(obj);
+		QueryHelperResult result = helper.getDeleteQuery();
 		if(result.isSuccess()){
 			return connector.executeUpdate(result.getValue())!=0;
 		}
@@ -84,8 +84,8 @@ public class Connector{
 	}
 
 	public boolean Update(IConnectable connector, IObject obj, IObject toUpdate){
-		SQLiteHelper helper = new SQLiteHelper(obj);
-		SQLiteHelperResult result = helper.getUpdateQuery(toUpdate);
+		QueryHelper helper = new QueryHelper(obj);
+		QueryHelperResult result = helper.getUpdateQuery(toUpdate);
 		if(result.isSuccess() && !result.getValue().isEmpty()){
 			return connector.executeUpdate(result.getValue())!=0;
 		}
@@ -103,8 +103,8 @@ public class Connector{
 	}
 
 	public <T extends IObject> ArrayList<T> Select(IConnectable connector, Class<T> cls, String[] fieldnames, WhereDefinition[] where, OrderByDefinition[] orderby,String groupby,int limit){
-		SQLiteHelper helper = new SQLiteHelper(cls);		
-		SQLiteHelperResult result = null;
+		QueryHelper helper = new QueryHelper(cls);		
+		QueryHelperResult result = null;
 		if(implementsInterface(cls,IView.class)){
 			result = helper.getSelectViewQuery(where);
 		}else{
@@ -140,7 +140,7 @@ public class Connector{
 			for(int i=0;i<fields.length;i++){
 				fields[i].setAccessible(true);
 
-				ColumnDefinition definition = SQLiteHelper.getDefinition(cls, fields[i]);
+				ColumnDefinition definition = QueryHelper.getDefinition(cls, fields[i]);
 
 				Column column = definition.getColumn();
 				if(column != null){
@@ -250,16 +250,4 @@ public class Connector{
 		return null;		
 	}
 
-	public static ArrayList<RelationInfo> getRelations(Class<? extends IObject> cls){
-		ArrayList<RelationInfo> relations = new ArrayList<RelationInfo>();
-		Field[] fields = cls.getDeclaredFields();
-		for(Field field : fields){
-			field.setAccessible(true);
-			Relation rel = field.getAnnotation(Relation.class);
-			if(rel != null){
-				relations.add(new RelationInfo(rel.table(),rel.field(),rel.name(),rel.action(),rel.rule()));
-			}
-		}
-		return relations;
-	}
 }

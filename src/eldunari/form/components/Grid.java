@@ -17,15 +17,15 @@ public class Grid<T> extends JTable implements IComponent{
 	private int percentWidth;
 	private Orientation orientation;
 	private IComponent neighborComponent;	
-	
+
 	private final ArrayList<T> mItems;
 	private final Class<T> cls;
-	
+
 	private int maxWidth;
 	private int minWidth;
 	private int maxHeight;
 	private int minHeight;	
-	
+
 	public Grid(Class<T> cls){
 		this.cls = cls;
 		this.mItems = null;
@@ -39,7 +39,6 @@ public class Grid<T> extends JTable implements IComponent{
 		super(rows,columns);
 		this.cls = cls;
 		mItems = items;
-		
 	}
 	public Grid(Class<T> cls, GridModel<T> dm){
 		super(dm);
@@ -66,7 +65,7 @@ public class Grid<T> extends JTable implements IComponent{
 	public Point getLocationXY(){
 		return super.getLocation();
 	}	
-	
+
 	public void setLocation(int x, int y){
 		super.setLocation(x, y);
 	}
@@ -123,10 +122,10 @@ public class Grid<T> extends JTable implements IComponent{
 		this.minHeight = height;
 		this.minWidth = width;	
 	}
-	
+
 	private boolean lockx;
 	private boolean locky;	
-	
+
 	public void setLockedX(boolean value){
 		this.lockx = value;
 	}
@@ -139,7 +138,7 @@ public class Grid<T> extends JTable implements IComponent{
 	public boolean isLockedY(){
 		return locky;
 	}
-	
+
 	public void setValue(Object obj){}
 	public Object getValue(){
 		return null;

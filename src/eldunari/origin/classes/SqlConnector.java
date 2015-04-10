@@ -152,6 +152,5 @@ public class SqlConnector extends Connector implements IConnectable{
 	@Override
 	public String getTriggerPackage() {
 		return TRIGGER_PACKAGE;
-	}	
-	
+	}
 }

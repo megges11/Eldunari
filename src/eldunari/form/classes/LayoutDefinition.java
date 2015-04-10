@@ -2,6 +2,7 @@ package eldunari.form.classes;
 
 import java.util.ArrayList;
 
+import eldunari.form.annotation.Caption;
 import eldunari.form.annotation.Dimension;
 import eldunari.form.annotation.InputField;
 import eldunari.form.annotation.FormLabel;
@@ -11,6 +12,7 @@ public class LayoutDefinition {
 	private FormLabel label;
 	private Dimension dimension;
 	private InputField inputField;
+	private Caption caption;
 	
 	private ArrayList<String> errors = new ArrayList<String>();
 	
@@ -62,6 +64,16 @@ public class LayoutDefinition {
 	}
 	public boolean hasErrors(){
 		return !this.errors.isEmpty();
+	}
+	public Caption getCaption() {
+		return caption;
+	}
+	public void setCaption(Caption caption) {
+		if(this.caption != null && !this.caption.equals(caption)){
+			addError("Caption already set");
+			return;
+		}
+		this.caption = caption;
 	}
 	
 }

@@ -47,6 +47,15 @@ public class TextField extends JTextField implements IComponent{
 	public Orientation getOrientation() {
 		return orientation;
 	}
+	
+	public void setSize(int width,int height){
+		minHeight = height;
+		maxHeight = height;
+		minWidth = width;
+		maxWidth = width;
+		super.setSize(width, height);
+	}
+	
 	@Override
 	public IComponent getNeighbor(){
 		return neighborComponent;
@@ -55,7 +64,7 @@ public class TextField extends JTextField implements IComponent{
 	public void setSizePercent(Component parent,int percentWidth, int percentHeight) {
 		this.percentWidth = percentWidth;
 		this.percentHeight = percentHeight;
-		this.setSize(parent.getWidth()*(percentWidth/100),parent.getHeight()*(percentHeight/100));
+		super.setSize(parent.getWidth()*(percentWidth/100),parent.getHeight()*(percentHeight/100));
 	}
 	public int getPercentHeight(){
 		return percentHeight;

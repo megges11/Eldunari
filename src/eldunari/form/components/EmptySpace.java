@@ -3,15 +3,14 @@ package eldunari.form.components;
 import java.awt.Component;
 import java.awt.Point;
 
-import javax.swing.JCheckBox;
+import javax.swing.JPanel;
 
 import eldunari.form.classes.helper.VisualHelper;
 import eldunari.form.enumation.Orientation;
 import eldunari.form.interfaces.IComponent;
 
-public class CheckBox extends JCheckBox implements IComponent{
-	private static final long serialVersionUID = -8054510212083812687L;
-
+public class EmptySpace extends JPanel implements IComponent{
+	private static final long serialVersionUID = 7520673433207537059L;
 	private String tag;
 	private Orientation orientation;
 	private IComponent neighborComponent;
@@ -112,13 +111,9 @@ public class CheckBox extends JCheckBox implements IComponent{
 		return locky;
 	}
 
-	public void setValue(Object obj){
-		if(obj != null){
-			this.setText(String.valueOf(obj));
-		}		
-	}
+	public void setValue(Object obj){}
 	public Object getValue(){
-		return this.getText();
+		return null;
 	}
 	private String neighborName;
 	public void setNeighborString(String value){
@@ -132,12 +127,10 @@ public class CheckBox extends JCheckBox implements IComponent{
 	}
 
 	@Override
-	public void setEditable(boolean value) {
-		this.setEnabled(value);
-	}
+	public void setEditable(boolean value) {}
 
 	@Override
 	public boolean isEditable() {
-		return this.isEnabled();
-	}
+		return false;
+	}	
 }
