@@ -10,6 +10,7 @@ import java.util.HashMap;
 import eldunari.general.annotation.Definition;
 import eldunari.origin.annotation.Column;
 import eldunari.origin.annotation.DefaultValue;
+import eldunari.origin.annotation.Filter;
 import eldunari.origin.annotation.Format;
 import eldunari.origin.annotation.Precision;
 import eldunari.origin.annotation.PrimaryKey;
@@ -242,16 +243,35 @@ public class QueryHelper {
 			sql+="*";
 		}
 		sql += " FROM "+getTableName(cls);
+		boolean whereset = false;
+		boolean wherehasvalue = false;
 		if(where!=null && where.length!= 0){
-			sql+=" WHERE ";
+			sql +=" WHERE ";
+			whereset = true;
 			for(int i = 0; i<where.length;i++){
 				WhereDefinition wheredef = where[i];
 				sql+= wheredef.getClause();
+				wherehasvalue = true;
 				if(i<where.length-1){
 					sql+= " AND ";
 				}
 			}
 		}
+		
+		TableDefinition tabledef = getDefinition(cls);
+		if(tabledef.getFilter()!=null){
+			Filter filter = tabledef.getFilter();
+			if(filter.value()!= null){
+				if(!whereset){
+					sql+=" WHERE ";
+				}
+				if(wherehasvalue){
+					sql+="AND ";
+				}
+				sql+=filter.value();
+			}
+		}
+		
 		if(orderby!=null && orderby.length!=0){
 			sql+=" ORDER BY ";
 			for(int i = 0; i<orderby.length;i++){
@@ -402,6 +422,7 @@ public class QueryHelper {
 			return cls.getSimpleName();
 		}
 	}
+	
 	private String getFieldValue(Column column, Field field,IObject tempObj) {
 		try {
 			IObject obj = (tempObj == null) ? this.obj : tempObj;
@@ -475,6 +496,18 @@ public class QueryHelper {
 		return "No type found change database type or Attribute type to match field and column";
 	}
 
+	public static TableDefinition getDefinition(Class<? extends IObject> cls){
+		TableDefinition definition = new TableDefinition();
+		for(Annotation anno : cls.getAnnotations()){
+			if(anno.annotationType().equals(Filter.class)){
+				definition.setFilter((Filter)anno);
+			}else if(anno.annotationType().equals(Definition.class)){
+				definition.setDefinition((Definition)anno);
+			}
+		}
+		return definition;
+	}
+	
 	public static ColumnDefinition getDefinition(Class<? extends IObject> cls, Field field){
 		ColumnDefinition definition = new ColumnDefinition();
 		field.setAccessible(true);

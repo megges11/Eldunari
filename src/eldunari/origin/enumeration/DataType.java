@@ -5,6 +5,7 @@ import java.util.Date;
 
 public enum DataType {
 	
+	VARCHAR("VARCHAR",String.class),
 	TEXT("TEXT",String.class,char.class), 
 	INTEGER("INTEGER",int.class,Integer.class,boolean.class,byte.class,long.class,Calendar.class,Date.class),
 	NUMERIC("NUMERIC",double.class,float.class),

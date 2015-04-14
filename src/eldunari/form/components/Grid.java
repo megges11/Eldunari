@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 
 import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 
 import eldunari.form.classes.GridModel;
 import eldunari.form.classes.helper.VisualHelper;
@@ -21,6 +22,11 @@ public class Grid<T> extends JTable implements IComponent{
 	private final ArrayList<T> mItems;
 	private final Class<T> cls;
 
+	private Object[] columns;
+	
+	private boolean lockx;
+	private boolean locky;	
+
 	private int maxWidth;
 	private int minWidth;
 	private int maxHeight;
@@ -29,21 +35,25 @@ public class Grid<T> extends JTable implements IComponent{
 	public Grid(Class<T> cls){
 		this.cls = cls;
 		this.mItems = null;
+		this.columns = null;
 	}
 	public Grid(Class<T> cls,int numRows, int numColumns){
 		super(numRows,numColumns);
 		this.cls = cls;
 		mItems = new ArrayList<T>(numRows);
+		this.columns = null;
 	}
 	public Grid(Class<T> cls,ArrayList<T> items,Object[][] rows, Object[] columns){
 		super(rows,columns);
 		this.cls = cls;
 		mItems = items;
+		this.columns = columns;
 	}
 	public Grid(Class<T> cls, GridModel<T> dm){
 		super(dm);
 		this.cls = cls;
 		mItems = dm.getItems();
+		this.columns = dm.getColumns();
 	}	
 
 	public ScrollPane getTableWithHead(){
@@ -52,7 +62,16 @@ public class Grid<T> extends JTable implements IComponent{
 		scp.setLocation(this.getLocation());
 		return scp;
 	}
-
+	
+	public void reload(Object[][] data){
+		((DefaultTableModel) this.getModel()).setDataVector(data, columns);
+	}
+	
+	public void reload(Object[][] data,Object[] columns){
+		this.columns = columns;
+		((DefaultTableModel) this.getModel()).setDataVector(data, columns);
+	}
+	
 	@Override
 	public void setTag(String value) {
 		this.tag = value;
@@ -123,9 +142,6 @@ public class Grid<T> extends JTable implements IComponent{
 		this.minWidth = width;	
 	}
 
-	private boolean lockx;
-	private boolean locky;	
-
 	public void setLockedX(boolean value){
 		this.lockx = value;
 	}
@@ -167,6 +183,9 @@ public class Grid<T> extends JTable implements IComponent{
 	}
 	public void setOrientation(Orientation orientation){
 		this.orientation = orientation;
+	}
+	public Object[] getColumns() {
+		return columns;
 	}
 
 }

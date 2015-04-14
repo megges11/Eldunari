@@ -1,5 +1,6 @@
 package eldunari.form.components;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -11,17 +12,19 @@ import eldunari.form.interfaces.IComponent;
 import eldunari.form.interfaces.IForm;
 import eldunari.form.interfaces.IResizeListener;
 
-import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
 
 import eldunari.form.classes.helper.VisualHelper;
 import eldunari.form.enumation.ViewType;
 import eldunari.origin.interfaces.IObject;
 
-public abstract class Form extends JFrame implements IResizeListener,IForm{
+public abstract class InternalForm extends JInternalFrame implements IResizeListener,IForm{
 	private static final long serialVersionUID = 8173638485155786959L;
 
 
 	public static final Dimension DEFAULT_SIZE = new Dimension(700,500);
+	public String TITLE = "Eldunari Form";
+	public static Color DEFAULT_BACKGROUND = Color.LIGHT_GRAY;
 	public static int TOOLBAR_HEIGHT = 25;
 	public static int DEFAULT_PADDING_LEFT = 5;
 	public static int DEFAULT_PADDING_TOP = 5;
@@ -35,14 +38,14 @@ public abstract class Form extends JFrame implements IResizeListener,IForm{
 	public Class<? extends IObject> currentClass;
 	public IObject currentObject;
 	public ViewType currentViewType;
+	public ToolBar toolbar;
 	
 	public static Dimension DEFAULT_ITEM_SIZE(){
 		return new Dimension(DEFAULT_ITEM_WIDTH,DEFAULT_ITEM_HEIGHT);
 	}
 	
-	public Form(){}
-	
-	public Form(Class<? extends IObject> currentClass){
+	public InternalForm(Class<? extends IObject> currentClass){
+		this.setTitle(TITLE);
 		this.currentClass = currentClass;			
 		this.addComponentListener(new ComponentAdapter() {
 			public void componentResized(ComponentEvent e) {
@@ -114,7 +117,12 @@ public abstract class Form extends JFrame implements IResizeListener,IForm{
 		}
 		this.setContentPane(container);
 	}
-
+	
+	//	public void init_toolbar(){}
+	//	public abstract void init_toolbar(ViewType type);
+	//	public void init_toolbar(ToolBar toolbar){
+	//		this.add(toolbar);
+	//	}
 	public void reload(){
 		this.revalidate();
 		this.repaint();

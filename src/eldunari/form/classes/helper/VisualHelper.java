@@ -11,6 +11,7 @@ import javax.swing.JTable;
 import eldunari.form.enumation.Orientation;
 import eldunari.form.enumation.ViewType;
 import eldunari.form.interfaces.IComponent;
+import eldunari.form.interfaces.IForm;
 import eldunari.form.interfaces.IGridLayer;
 import eldunari.form.interfaces.ILayer;
 import eldunari.general.classes.ClassFinder;
@@ -29,7 +30,7 @@ public class VisualHelper {
 	public static String grid_package = "de.itx3.winforms.grid";
 
 
-	public static Container getLayout(Form frame,Class<?> currentClass,ViewType type,Dimension dimension) {
+	public static Container getLayout(IForm frame,Class<?> currentClass,ViewType type,Dimension dimension) {
 		try{
 			String searchPackage = getPackage(type);			
 			if(type == ViewType.GridView || type == ViewType.GridViewSelect){

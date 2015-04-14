@@ -9,17 +9,18 @@ public class GridModel<T> extends DefaultTableModel{
 	private boolean isEditable = false;
 	private final Class<T> cls;
 	private final ArrayList<T> mItems;
+	private final Object[] columns;
 	
 	public GridModel(Class<T> cls,ArrayList<T> items,Object[][] rows, Object[] columns){
 		super(rows,columns);
 		this.cls = cls;
 		this.mItems = items;
+		this.columns = columns;
 	}
 	
 	public ArrayList<T> getItems(){		
 		return mItems;		
 	}
-	
 	
 	
 	@Override
@@ -29,5 +30,9 @@ public class GridModel<T> extends DefaultTableModel{
 
 	public Class<T> getCls() {
 		return cls;
+	}
+
+	public Object[] getColumns() {
+		return columns;
 	}
 }
