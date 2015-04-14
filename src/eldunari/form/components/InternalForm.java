@@ -15,7 +15,7 @@ import eldunari.form.interfaces.IResizeListener;
 import javax.swing.JInternalFrame;
 
 import eldunari.form.classes.helper.VisualHelper;
-import eldunari.form.enumation.ViewType;
+import eldunari.form.enumeration.ViewType;
 import eldunari.origin.interfaces.IObject;
 
 public abstract class InternalForm extends JInternalFrame implements IResizeListener,IForm{

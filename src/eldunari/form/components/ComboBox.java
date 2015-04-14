@@ -6,7 +6,7 @@ import java.awt.Point;
 import javax.swing.JComboBox;
 
 import eldunari.form.classes.helper.VisualHelper;
-import eldunari.form.enumation.Orientation;
+import eldunari.form.enumeration.Orientation;
 import eldunari.form.interfaces.IComponent;
 
 public class ComboBox<T> extends JComboBox<T> implements IComponent{
@@ -20,6 +20,10 @@ public class ComboBox<T> extends JComboBox<T> implements IComponent{
 	private int minWidth;
 	private int maxHeight;
 	private int minHeight;
+	
+	public ComboBox(T[] values){
+		super(values);
+	}
 	
 	public void setTag(String value){
 		this.tag = value;

@@ -10,11 +10,13 @@ import eldunari.form.annotation.Caption;
 import eldunari.form.annotation.Dimension;
 import eldunari.form.annotation.InputField;
 import eldunari.form.annotation.FormLabel;
+import eldunari.form.annotation.ReadOnly;
 import eldunari.form.components.Label;
 import eldunari.form.interfaces.IComponent;
 import eldunari.general.annotation.Definition;
 import eldunari.general.classes.OutputHandler;
 import eldunari.general.enumeration.OutputType;
+import eldunari.origin.annotation.Required;
 
 public class LayoutCreator {
 
@@ -47,21 +49,27 @@ public class LayoutCreator {
 	private void load_annotations(){
 		try {
 			components = new ArrayList<IComponent>();
+			ReadOnly ro = currentClass.getAnnotation(ReadOnly.class);
+			boolean isReadOnly = (ro != null) ? ro.value() : false; 
+			
 			for(Field field : currentClass.getDeclaredFields()){
 				LayoutDefinition definition = getDefinition(currentClass,field);
 				if(definition.hasErrors()){
 					OutputHandler.Message(OutputType.Warning, definition.getError());
 					return;
 				}			
-
+				
+				Required req = field.getAnnotation(Required.class);
+				boolean isrequired = (req == null) ? false : req.value();
+				
 				if(definition.getLabel() != null){
 					FormLabel fl = definition.getLabel();
 					Label lbl = new Label();
 					lbl.setName(fl.name());
-					if(definition.getCaption()!= null){
-						lbl.setText(definition.getCaption().value());
+					if(definition.getCaption()!= null){						
+						lbl.setText(definition.getCaption().value()+ ((isrequired)?"*":""));
 					}else{
-						lbl.setText(fl.text());
+						lbl.setText(fl.text()+ ((isrequired)?"*":""));
 					}
 					lbl.setTag(fl.tag());
 					lbl.setSize(fl.width(),fl.height());
@@ -75,7 +83,7 @@ public class LayoutCreator {
 				InputField ifield = definition.getInputField();
 				if(ifield != null){
 					IComponent com = ifield.cls().newInstance();
-					com.setEditable(ifield.editable());
+					com.setEditable((isReadOnly == true)? true : ifield.editable());
 					com.setName(ifield.name());
 					com.setSize(ifield.width(), ifield.height());
 					com.setTag(ifield.tag());

@@ -5,7 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import eldunari.form.enumation.Orientation;
+import eldunari.form.enumeration.Orientation;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)

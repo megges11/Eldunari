@@ -6,7 +6,7 @@ import javax.swing.JFormattedTextField;
 import javax.swing.text.MaskFormatter;
 
 import eldunari.form.classes.helper.VisualHelper;
-import eldunari.form.enumation.Orientation;
+import eldunari.form.enumeration.Orientation;
 import eldunari.form.interfaces.IComponent;
 
 public class FormattedTextField extends JFormattedTextField implements IComponent{

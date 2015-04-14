@@ -20,6 +20,7 @@ import eldunari.origin.interfaces.IView;
 
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -34,6 +35,7 @@ public class Connector{
 		QueryHelper helper = new QueryHelper(cls);
 		QueryHelperResult result = helper.getTableQuery();
 		if(result.isSuccess()){	
+			System.out.println(result.getValue());
 			connector.executeUpdate(result.getValue());
 		}else{
 			throw new Exception(result.getMessage());
@@ -196,8 +198,16 @@ public class Connector{
 					field.setShort(obj, Short.parseShort(value+""));
 				}else if(type.equals(Date.class)){
 					if(value != null){
-						long val = Long.parseLong(value+"");
-						field.set(obj, new Date(val));
+						String sval = value+"";
+						System.out.println(sval.length());
+						if(sval.contains(".")){
+							SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
+							Date date = formatter.parse(sval);
+							field.set(obj, date);
+						}else{
+							long val = Long.parseLong(sval);
+							field.set(obj, new Date(val));
+						}
 					}
 				}else if(type.equals(Calendar.class)){
 					if(value != null){

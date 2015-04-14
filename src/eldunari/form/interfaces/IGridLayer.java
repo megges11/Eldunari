@@ -4,5 +4,5 @@ import java.awt.Container;
 
 public interface IGridLayer {
 
-	Container getContainer(IForm frame,boolean onClickEnabled);
+	Container getContainer(final IForm frame,boolean onClickEnabled);
 }

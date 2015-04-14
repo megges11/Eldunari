@@ -6,7 +6,7 @@ import java.awt.Point;
 import javax.swing.JRadioButton;
 
 import eldunari.form.classes.helper.VisualHelper;
-import eldunari.form.enumation.Orientation;
+import eldunari.form.enumeration.Orientation;
 import eldunari.form.interfaces.IComponent;
 
 public class RadioButton extends JRadioButton implements IComponent{

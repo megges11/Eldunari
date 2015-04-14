@@ -8,8 +8,8 @@ import java.lang.reflect.Field;
 
 import javax.swing.JTable;
 
-import eldunari.form.enumation.Orientation;
-import eldunari.form.enumation.ViewType;
+import eldunari.form.enumeration.Orientation;
+import eldunari.form.enumeration.ViewType;
 import eldunari.form.interfaces.IComponent;
 import eldunari.form.interfaces.IForm;
 import eldunari.form.interfaces.IGridLayer;
@@ -22,6 +22,7 @@ import eldunari.origin.classes.helper.ColumnDefinition;
 import eldunari.origin.classes.helper.QueryHelper;
 import eldunari.origin.interfaces.IObject;
 import eldunari.form.annotation.DataModel;
+import eldunari.form.annotation.DisplayValue;
 import eldunari.form.components.Form;
 
 public class VisualHelper {
@@ -102,9 +103,9 @@ public class VisualHelper {
 				Field[] fields = cls.getDeclaredFields();
 				for(Field field : fields){
 					field.setAccessible(true);
-					
+
 					ColumnDefinition definition = QueryHelper.getDefinition(obj.getClass(), field);
-					
+
 					Column col = definition.getColumn();
 					if(col != null){
 						String col_name = col.name();
@@ -213,4 +214,25 @@ public class VisualHelper {
 	public static Point GetPosition(){
 		return Form.DEFAULT_COMPONENT_START_LOCATION;
 	}
+
+	public static String getDisplayValue(Class<?> cls,ViewType type){
+		String display = cls.getSimpleName();	
+		DisplayValue value = cls.getAnnotation(DisplayValue.class);
+		if(value != null){
+			String[] displayvalues = value.value();
+			if(displayvalues.length > 0){
+				if(displayvalues.length > 1){
+					if(type == ViewType.GridView || type == ViewType.GridViewSelect){
+						display = displayvalues[1];
+					}else{
+						display = displayvalues[0];
+					}
+				}else{
+					display = displayvalues[0];
+				}
+			}
+		}
+		return display;
+	}
+
 }

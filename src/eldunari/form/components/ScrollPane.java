@@ -6,7 +6,7 @@ import java.awt.Point;
 import javax.swing.JScrollPane;
 
 import eldunari.form.classes.helper.VisualHelper;
-import eldunari.form.enumation.Orientation;
+import eldunari.form.enumeration.Orientation;
 import eldunari.form.interfaces.IComponent;
 
 public class ScrollPane extends JScrollPane implements IComponent{

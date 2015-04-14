@@ -4,7 +4,7 @@ import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import eldunari.form.enumation.ViewType;
+import eldunari.form.enumeration.ViewType;
 import eldunari.origin.interfaces.IObject;
 
 public class SelectionForm extends Form {
@@ -34,7 +34,7 @@ public class SelectionForm extends Form {
 		
 		Component component = this.getContentPane().getComponentAt(0,0);
 		if(component instanceof Grid){
-			Grid<?> table = (Grid<?>) component;
+			Grid table = (Grid) component;
 			table.addMouseListener(new MouseAdapter() {
 				public void mousePressed(MouseEvent me) {
 					Point p = me.getPoint();

@@ -1,7 +1,8 @@
 package eldunari.form.interfaces;
 
 import java.awt.Container;
-import eldunari.form.enumation.ViewType;
+
+import eldunari.form.enumeration.ViewType;
 
 public interface ILayer {
 

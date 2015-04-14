@@ -7,11 +7,12 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 import eldunari.form.classes.GridModel;
+import eldunari.form.classes.helper.GridHelper;
 import eldunari.form.classes.helper.VisualHelper;
-import eldunari.form.enumation.Orientation;
+import eldunari.form.enumeration.Orientation;
 import eldunari.form.interfaces.IComponent;
 
-public class Grid<T> extends JTable implements IComponent{
+public class Grid extends JTable implements IComponent{
 	private static final long serialVersionUID = -5194270868779952867L;
 	private String tag;
 	private int percentHeight;
@@ -19,8 +20,8 @@ public class Grid<T> extends JTable implements IComponent{
 	private Orientation orientation;
 	private IComponent neighborComponent;	
 
-	private final ArrayList<T> mItems;
-	private final Class<T> cls;
+	private ArrayList<?> mItems;
+	private final Class<?> cls;
 
 	private Object[] columns;
 	
@@ -32,24 +33,19 @@ public class Grid<T> extends JTable implements IComponent{
 	private int maxHeight;
 	private int minHeight;	
 
-	public Grid(Class<T> cls){
+	public Grid(Class<?> cls){
 		this.cls = cls;
 		this.mItems = null;
 		this.columns = null;
 	}
-	public Grid(Class<T> cls,int numRows, int numColumns){
-		super(numRows,numColumns);
-		this.cls = cls;
-		mItems = new ArrayList<T>(numRows);
-		this.columns = null;
-	}
-	public Grid(Class<T> cls,ArrayList<T> items,Object[][] rows, Object[] columns){
+
+	public Grid(Class<?> cls,ArrayList<?> items,Object[][] rows, Object[] columns){
 		super(rows,columns);
 		this.cls = cls;
 		mItems = items;
 		this.columns = columns;
 	}
-	public Grid(Class<T> cls, GridModel<T> dm){
+	public Grid(Class<?> cls, GridModel dm){
 		super(dm);
 		this.cls = cls;
 		mItems = dm.getItems();
@@ -65,6 +61,12 @@ public class Grid<T> extends JTable implements IComponent{
 	
 	public void reload(Object[][] data){
 		((DefaultTableModel) this.getModel()).setDataVector(data, columns);
+	}
+	
+	public void reload(ArrayList<?> data,String[] fieldnames){
+		mItems = data;
+		GridHelper helper = new GridHelper(cls,mItems,fieldnames);	
+		((DefaultTableModel) this.getModel()).setDataVector(helper.getRows(), helper.getColumns());
 	}
 	
 	public void reload(Object[][] data,Object[] columns){
@@ -159,10 +161,10 @@ public class Grid<T> extends JTable implements IComponent{
 	public Object getValue(){
 		return null;
 	}
-	public ArrayList<T> getItems() {
+	public ArrayList<?> getItems() {
 		return mItems;
 	}
-	public Class<T> getCls() {
+	public Class<?> getCls() {
 		return cls;
 	}
 	@Override

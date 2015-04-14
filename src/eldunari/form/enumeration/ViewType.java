@@ -1,4 +1,4 @@
-package eldunari.form.enumation;
+package eldunari.form.enumeration;
 
 public enum ViewType {
 

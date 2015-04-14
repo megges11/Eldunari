@@ -3,7 +3,7 @@ package eldunari.form.interfaces;
 import java.awt.Container;
 
 import eldunari.origin.interfaces.IObject;
-import eldunari.form.enumation.ViewType;
+import eldunari.form.enumeration.ViewType;
 
 public interface IForm {
 

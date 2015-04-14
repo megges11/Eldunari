@@ -4,7 +4,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 
-import eldunari.form.enumation.Orientation;
+import eldunari.form.enumeration.Orientation;
 
 public interface IComponent {
 	void setTag(String value);
