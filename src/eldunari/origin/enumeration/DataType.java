@@ -5,7 +5,7 @@ import java.util.Date;
 
 public enum DataType {
 	
-	LONG("LONG",long.class,Long.class,Date.class,Calendar.class),
+	LONG("BIGINT",long.class,Long.class,Date.class,Calendar.class),
 	VARCHAR("VARCHAR",String.class),
 	TEXT("TEXT",String.class,char.class), 
 	INTEGER("INTEGER",int.class,Integer.class,boolean.class,byte.class,long.class,Calendar.class,Date.class),

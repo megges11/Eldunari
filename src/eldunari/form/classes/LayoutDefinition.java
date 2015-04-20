@@ -6,6 +6,7 @@ import eldunari.form.annotation.Caption;
 import eldunari.form.annotation.Dimension;
 import eldunari.form.annotation.InputField;
 import eldunari.form.annotation.FormLabel;
+import eldunari.origin.annotation.Format;
 
 public class LayoutDefinition {
 
@@ -13,6 +14,7 @@ public class LayoutDefinition {
 	private Dimension dimension;
 	private InputField inputField;
 	private Caption caption;
+	private Format format;
 	
 	private ArrayList<String> errors = new ArrayList<String>();
 	
@@ -74,6 +76,16 @@ public class LayoutDefinition {
 			return;
 		}
 		this.caption = caption;
+	}
+	public void setFormat(Format format) {
+		if(this.format != null && !this.format.equals(format)){
+			addError("Format already set");
+			return;
+		}
+		this.format = format;
+	}
+	public Format getFormat(){
+		return this.format;
 	}
 	
 }

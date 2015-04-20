@@ -7,6 +7,7 @@ import eldunari.general.enumeration.OutputType;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class GridHelper {
 
@@ -62,6 +63,9 @@ public class GridHelper {
 								rows[i][j] = field.getBoolean(mItems.get(i));
 							}else if(fieldType.equals(int.class)){
 								rows[i][j] = field.getInt(mItems.get(i));
+							}else if(fieldType.equals(Date.class)){
+								Date val = (Date) field.get(mItems.get(i));							
+								rows[i][j] = VisualHelper.formatDate(val, currentClass, field);								
 							}else{
 								rows[i][j] = field.get(mItems.get(i));
 							}

@@ -5,6 +5,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import eldunari.form.enumeration.ViewType;
+import eldunari.form.interfaces.IForm;
 import eldunari.origin.interfaces.IObject;
 
 public class SelectionForm extends Form {
@@ -46,5 +47,15 @@ public class SelectionForm extends Form {
 			});			
 		}				
 		return text;
+	}
+
+	@Override
+	public IForm getParentForm() {
+		return null;
+	}
+
+	@Override
+	public void setParentForm(IForm parentForm) {
+		
 	}
 }

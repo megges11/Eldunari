@@ -48,48 +48,52 @@ public class QueryHelper {
 		if(cls == null){
 			return new QueryHelperResult(false,"","Class<? extends IObject> can not be null");
 		}
-		String sql = "CREATE TABLE IF NOT EXISTS "+getTableName(cls)+"(";
-		Field[] fields = cls.getDeclaredFields();
+		
+		if(!Connector.implementsInterface(cls,IView.class)){
+			String sql = "CREATE TABLE IF NOT EXISTS "+getTableName(cls)+"(";
+			Field[] fields = cls.getDeclaredFields();
 
-		HashMap<String,PrimaryKey> primaryKeyCols = new HashMap<String,PrimaryKey>();
-		HashMap<Column,ArrayList<Relation>> relationCols = new HashMap<Column,ArrayList<Relation>>();
+			HashMap<String,PrimaryKey> primaryKeyCols = new HashMap<String,PrimaryKey>();
+			HashMap<Column,ArrayList<Relation>> relationCols = new HashMap<Column,ArrayList<Relation>>();
 
-		for(int i = 0; i<fields.length ; i++){			
-			Field field = fields[i];
-			field.setAccessible(true);
-			ColumnDefinition definition = getDefinition(cls,field);
-			if(definition.hasErrors()){
-				return new QueryHelperResult(false,"",definition.getError());
-			}
-			if(definition.getColumn()!= null){
-				String fieldsql = definition.getColumn().name();
-				fieldsql += getColumnType(definition.getColumn(), field);
-				fieldsql += getPrecision(definition.getPrecision());
-				fieldsql += getNullable(definition.getRequired());
-				//fieldsql += (definition.getColumn().nullable()) ? " NULL" : " NOT NULL" ;
-				fieldsql += getDefaultValue(definition.getDefaultValue());			
-				fieldsql += (i < fields.length-1) ? "," : "" ;
-				sql += fieldsql;
-				if(definition.getPrimaryKey()!= null){
-					//System.err.println(cls.getSimpleName()+" "+definition.getColumn().name());
-					primaryKeyCols.put(definition.getColumn().name(),definition.getPrimaryKey());
+			for(int i = 0; i<fields.length ; i++){			
+				Field field = fields[i];
+				field.setAccessible(true);
+				ColumnDefinition definition = getDefinition(cls,field);
+				if(definition.hasErrors()){
+					return new QueryHelperResult(false,"",definition.getError());
 				}
-				if(!definition.getRelations().isEmpty()){
-					relationCols.put(definition.getColumn(), definition.getRelations());
+				if(definition.getColumn()!= null){
+					String fieldsql = definition.getColumn().name();
+					fieldsql += getColumnType(definition.getColumn(), field);
+					fieldsql += getPrecision(definition.getPrecision());
+					fieldsql += getNullable(definition.getRequired());
+					//fieldsql += (definition.getColumn().nullable()) ? " NULL" : " NOT NULL" ;
+					fieldsql += getDefaultValue(definition.getDefaultValue());			
+					fieldsql += (i < fields.length-1) ? "," : "" ;
+					sql += fieldsql;
+					if(definition.getPrimaryKey()!= null){
+						//System.err.println(cls.getSimpleName()+" "+definition.getColumn().name());
+						primaryKeyCols.put(definition.getColumn().name(),definition.getPrimaryKey());
+					}
+					if(!definition.getRelations().isEmpty()){
+						relationCols.put(definition.getColumn(), definition.getRelations());
+					}
 				}
 			}
-		}
-		String primaries = getPrimaryKeys(primaryKeyCols);
+			String primaries = getPrimaryKeys(primaryKeyCols);
 
-		if(!primaries.isEmpty()){
-			sql+=","+primaries;
+			if(!primaries.isEmpty()){
+				sql+=","+primaries;
+			}
+			String foreign = getForeignKeys(relationCols);
+			if(!foreign.isEmpty()){
+				sql+=foreign;	
+			}
+			sql+=");";
+			return new QueryHelperResult(true,sql);
 		}
-		String foreign = getForeignKeys(relationCols);
-		if(!foreign.isEmpty()){
-			sql+=foreign;	
-		}
-		sql+=");";
-		return new QueryHelperResult(true,sql);
+		return new QueryHelperResult(false,"","Can not create a table of IView");
 	}
 
 	public QueryHelperResult getInsertQuery(){
@@ -180,7 +184,7 @@ public class QueryHelper {
 					wherecount++;
 					where += column.name()+"="+getFieldValue(column,field,toUpdate);
 				}
-				
+
 			}else{
 				if(column != null){
 					String field_obj_value = getFieldValue(column,field,obj);
@@ -257,7 +261,7 @@ public class QueryHelper {
 				}
 			}
 		}
-		
+
 		TableDefinition tabledef = getDefinition(cls);
 		if(tabledef.getFilter()!=null){
 			Filter filter = tabledef.getFilter();
@@ -271,7 +275,7 @@ public class QueryHelper {
 				sql+=filter.value();
 			}
 		}
-		
+
 		if(orderby!=null && orderby.length!=0){
 			sql+=" ORDER BY ";
 			for(int i = 0; i<orderby.length;i++){
@@ -422,7 +426,7 @@ public class QueryHelper {
 			return cls.getSimpleName();
 		}
 	}
-	
+
 	private String getFieldValue(Column column, Field field,IObject tempObj) {
 		try {
 			IObject obj = (tempObj == null) ? this.obj : tempObj;
@@ -507,7 +511,7 @@ public class QueryHelper {
 		}
 		return definition;
 	}
-	
+
 	public static ColumnDefinition getDefinition(Class<? extends IObject> cls, Field field){
 		ColumnDefinition definition = new ColumnDefinition();
 		field.setAccessible(true);

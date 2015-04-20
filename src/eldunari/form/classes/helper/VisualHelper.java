@@ -5,6 +5,8 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.lang.reflect.Field;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.JTable;
 
@@ -18,11 +20,14 @@ import eldunari.general.classes.ClassFinder;
 import eldunari.general.classes.OutputHandler;
 import eldunari.general.enumeration.OutputType;
 import eldunari.origin.annotation.Column;
+import eldunari.origin.annotation.Format;
 import eldunari.origin.classes.helper.ColumnDefinition;
 import eldunari.origin.classes.helper.QueryHelper;
 import eldunari.origin.interfaces.IObject;
 import eldunari.form.annotation.DataModel;
 import eldunari.form.annotation.DisplayValue;
+import eldunari.form.classes.LayoutCreator;
+import eldunari.form.classes.LayoutDefinition;
 import eldunari.form.components.Form;
 
 public class VisualHelper {
@@ -112,7 +117,12 @@ public class VisualHelper {
 
 						IComponent component = getElementByTag(col_name,container);
 						if(component != null){
-							component.setValue(field.get(obj));							
+							Object val = field.get(obj);
+							if(field.getType().equals(Date.class)){														
+								component.setValue(formatDate((Date)val,cls,field));
+							}else{
+								component.setValue(val);
+							}
 						}
 					}
 				}
@@ -233,6 +243,18 @@ public class VisualHelper {
 			}
 		}
 		return display;
+	}
+
+	public static String formatDate(Date val, Class<?> cls, Field field){
+		LayoutDefinition layoutdefi = LayoutCreator.getDefinition(cls, field);
+		Format format = layoutdefi.getFormat();
+		if(format != null){
+			SimpleDateFormat formatter = new SimpleDateFormat(format.value());								
+			String date = formatter.format(val);			
+			return date;
+		}else{
+			return val.toString();
+		}
 	}
 
 }

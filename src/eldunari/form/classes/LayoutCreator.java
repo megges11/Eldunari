@@ -16,6 +16,7 @@ import eldunari.form.interfaces.IComponent;
 import eldunari.general.annotation.Definition;
 import eldunari.general.classes.OutputHandler;
 import eldunari.general.enumeration.OutputType;
+import eldunari.origin.annotation.Format;
 import eldunari.origin.annotation.Required;
 
 public class LayoutCreator {
@@ -100,7 +101,7 @@ public class LayoutCreator {
 		}
 	}
 
-	private LayoutDefinition getDefinition(Class<?> cls, Field field){
+	public static LayoutDefinition getDefinition(Class<?> cls, Field field){
 		LayoutDefinition layoutdef = new LayoutDefinition();
 		field.setAccessible(true);
 
@@ -118,6 +119,8 @@ public class LayoutCreator {
 							layoutdef.setDimension((Dimension)anno);
 						}else if(anno.annotationType().equals(Caption.class)){
 							layoutdef.setCaption((Caption)anno);
+						}else if(anno.annotationType().equals(Format.class)){
+							layoutdef.setFormat((Format)anno);
 						}
 					}
 				}
@@ -134,6 +137,8 @@ public class LayoutCreator {
 				layoutdef.setDimension((Dimension)anno);
 			}else if(anno.annotationType().equals(Caption.class)){
 				layoutdef.setCaption((Caption)anno);
+			}else if(anno.annotationType().equals(Format.class)){
+				layoutdef.setFormat((Format)anno);
 			}
 		}
 		return layoutdef;
