@@ -28,6 +28,11 @@ public class TextArea extends JTextArea implements IComponent{
 	private int minHeight;
 
 
+	public TextArea(){
+		this.setWrapStyleWord(true);
+		this.setLineWrap(true);
+	}
+	
 	@Override
 	public void setTag(String value) {
 		this.tag = value;

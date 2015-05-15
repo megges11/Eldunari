@@ -83,8 +83,8 @@ public class LayoutCreator {
 
 				InputField ifield = definition.getInputField();
 				if(ifield != null){
-					IComponent com = ifield.cls().newInstance();
-					com.setEditable((isReadOnly == true)? true : ifield.editable());
+					IComponent com = ifield.cls().newInstance();					
+					com.setEditable((isReadOnly == true)? false : ifield.editable());
 					com.setName(ifield.name());
 					com.setSize(ifield.width(), ifield.height());
 					com.setTag(ifield.tag());
