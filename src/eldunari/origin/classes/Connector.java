@@ -35,7 +35,6 @@ public class Connector{
 		QueryHelper helper = new QueryHelper(cls);
 		QueryHelperResult result = helper.getTableQuery();
 		if(result.isSuccess()){	
-			System.out.println(result.getValue());
 			connector.executeUpdate(result.getValue());
 		}else{
 			throw new Exception(result.getMessage());
